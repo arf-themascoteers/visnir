@@ -3,8 +3,12 @@ from torch.utils.data import Dataset
 
 
 class SpectralDataset(Dataset):
-    def __init__(self, source):
-        self.df = source
+    def __init__(self, source=None, x=None, y=None):
+        if x is not None and y is not None:
+            y = torch.unsqueeze(y, dim=1)
+            self.df = torch.concatenate((x,y), dim=1)
+        else:
+            self.df = source
         self.x = source[:,0:-1]
         self.y = source[:,-1]
 

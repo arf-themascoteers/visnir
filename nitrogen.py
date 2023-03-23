@@ -4,7 +4,7 @@ from train import train
 from test import test
 from ann import ANN
 from n_ann import PHH_ANN
-from ann_nsoc import NSOC_ANN
+from annx import NSOC_ANN
 
 
 n_dset = ds_manager.DSManager("lucas", "phh")

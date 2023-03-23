@@ -1,8 +1,6 @@
-import torch
-from spectral_dataset import SpectralDataset
 from torch.utils.data import DataLoader
 from sklearn.metrics import r2_score
-import time
+
 
 def test(device, ds, model, return_pred = False, shuffle=False):
     batch_size = 30000
