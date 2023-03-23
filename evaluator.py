@@ -33,7 +33,7 @@ class Evaluator:
         self.sync_details_file()
         self.create_log_file()
 
-        self.TEST = True
+        self.TEST = False
         self.TEST_SCORE = 0
 
     def get_details_columns(self):
