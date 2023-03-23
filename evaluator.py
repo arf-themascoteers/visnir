@@ -6,10 +6,6 @@ from datetime import datetime
 import torch
 from train import train
 from test import test
-from sklearn.linear_model import LinearRegression
-from sklearn.cross_decomposition import PLSRegression
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.svm import SVR
 
 
 class Evaluator:
@@ -49,16 +45,13 @@ class Evaluator:
         return details_columns
 
     def get_summary_columns(self):
-        summary_columns = []
-        for config in self.configs:
-            summary_columns.append(f"{self.get_config_name(config)}")
-        return summary_columns
+        return ["ANN"]
 
     def get_details_index(self):
         details_index = []
         for i in range(self.repeat):
             for fold in range(self.folds):
-                details_index.append(f"{i}-{fold}")
+                details_index.append(f"I-{i}-{fold}")
         return details_index
 
     def get_details_row(self, repeat_number, fold_number):
@@ -116,36 +109,13 @@ class Evaluator:
 
     @staticmethod
     def get_config_name(config):
-        return "-".join(config.x)+"_"+config.y
-
-    @staticmethod
-    def get_alg_type(alg):
-        if type(alg) is dict:
-            return f"{alg['atype']}"
-        if isinstance(alg, str):
-            return alg
-
-    @staticmethod
-    def get_alg_name(alg):
-        if type(alg) is dict:
-            if "name" in alg:
-                if alg["name"] is not None:
-                    return alg["name"]
-            else:
-                return f"{alg['atype']}"
-        if isinstance(alg, str):
-            return alg
-
-    @staticmethod
-    def get_nn_config(alg):
-        if type(alg) is dict:
-            return alg
-        return {}
+        name = "-".join(config["x"])+"_"+config["y"]
+        name = name.replace("665-560-490","RGB")
+        return name
 
     def process(self):
         for index_config, config in enumerate(self.configs):
-            self.process_config(config)
-        self.calculate_mean()
+            self.process_config(index_config)
 
     def process_config(self, index_config):
         config = self.configs[index_config]
@@ -180,7 +150,7 @@ class Evaluator:
         config = self.configs[index_config]
         scores = []
         for repeat_number in range(self.repeat):
-            ds = ds_manager.DSManager(folds=self.folds, x=config.x, y=config.y)
+            ds = ds_manager.DSManager(folds=self.folds, x=config["x"], y=config["y"])
 
             for fold_number, (train_ds, test_ds) in enumerate(ds.get_k_folds()):
                 score = self.get_details(index_config, repeat_number, fold_number)
@@ -205,25 +175,16 @@ class Evaluator:
         return test(device, test_ds, model_instance)
 
 
-    def calculate_mean(self):
-        mean = np.zeros((len(self.colour_spaces), len(self.algorithms)))
-
-        for index_colour_space, colour_space in enumerate(self.colour_spaces):
-            for index_algorithm, algorithm in enumerate(self.algorithms):
-                mean[index_colour_space, index_algorithm] = \
-                    self.calculate_mean_algorithm_colour_space(index_algorithm, index_colour_space)
-
-        df = pd.DataFrame(data=mean, columns=self.summary_columns, index=self.create_mean_index())
-        df.to_csv(self.mean_file)
-
-    def calculate_mean_algorithm_colour_space(self, index_algorithm, index_colour_space):
-        score = 0
-        for index_dataset, dataset in enumerate(self.datasets):
-            score = score + self.get_score(index_dataset, index_algorithm, index_colour_space)
-        return np.round(score/len(self.datasets),3)
-
 
 if __name__ == "__main__":
-    ev = Evaluator()
+    ev = Evaluator(
+        cofigs=[
+            {"x":["665", "560", "490"], "y":"oc"},
+            {"x":["665", "560", "490","n"], "y":"oc"},
+            {"x":["665", "560", "490","oc"], "y":"n"},
+            {"x":["oc"], "y":"n"},
+        ],
+        repeat=3
+    )
     ev.process()
     print("Done all")
