@@ -12,7 +12,7 @@ if __name__ == "__main__":
     ev = Evaluator(
         cofigs=configs,
         repeat=1,
-        folds=2,
+        folds=10,
         prefix="ex"
     )
     ev.process()
