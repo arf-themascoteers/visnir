@@ -138,7 +138,7 @@ class Evaluator:
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model_instance = train(device, train_ds, machine)
-        return test(device, test_ds, model_instance)
+        return test(device, test_ds, model_instance, machine=machine)
 
     def create_summary_index(self):
         index = []
