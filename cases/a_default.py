@@ -5,9 +5,7 @@ from evaluator import Evaluator
 
 if __name__ == "__main__":
     ev = Evaluator(
-        datasets=["lucas"],
-        algorithms=["nn"],
-        colour_space_models=["vis"],
+        configs = [{"x":["665", "560", "490"], "y":"oc"}],
         prefix="j",
         verbose=True
     )

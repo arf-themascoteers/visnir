@@ -3,27 +3,16 @@ from torch.utils.data import DataLoader
 from ann import ANN
 
 
-def train(device, ds, model=None, nn_config=None):
-    DEFAULT_NUM_EPOCHS = 300
-    DEFAULT_BATCH_SIZE = 600
-    DEFAULT_LEARNING_RATE = 0.001
+def train(device, ds, model=None):
     torch.manual_seed(0)
     TEST = False
-    if nn_config is None:
-        nn_config = {"num_epochs": DEFAULT_NUM_EPOCHS, "batch_size":DEFAULT_BATCH_SIZE,
-                     "lr" : DEFAULT_LEARNING_RATE
-                     }
-    num_epochs = nn_config["num_epochs"] if "num_epochs" in nn_config else DEFAULT_NUM_EPOCHS
-    batch_size = nn_config["batch_size"] if "batch_size" in nn_config else DEFAULT_BATCH_SIZE
-    lr = nn_config["lr"] if "lr" in nn_config else DEFAULT_LEARNING_RATE
+    num_epochs = 300
+    batch_size = 600
+    lr = 0.001
     dataloader = DataLoader(ds, batch_size=batch_size, shuffle=True)
     x_size = ds.get_x().shape[1]
     if model is None:
-        model = ANN(size = x_size)
-    if TEST:
-        print(num_epochs, batch_size, lr)
-        print(model)
-        return model
+        model = ANN(size=x_size)
     model.train()
     model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=0.001)

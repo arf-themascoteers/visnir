@@ -13,30 +13,16 @@ from sklearn.svm import SVR
 
 
 class Evaluator:
-    def __init__(self, datasets=None, algorithms=None,
-                 colour_space_models=None, prefix="", verbose=False,
-                 repeat=1, folds=10, calc_mean = False
+    def __init__(self, cofigs=None, prefix="", verbose=False,
+                 repeat=1, folds=10
                  ):
+        if cofigs is None:
+            cofigs = [{"x":["665", "560", "490"], "y":"oc"}]
+        self.configs = cofigs
         self.repeat = repeat
         self.folds = folds
-        self.datasets = datasets
-        self.calc_mean = calc_mean
-        if self.datasets is None:
-            self.datasets = ["lucas"]
-        self.algorithms = algorithms
-        if self.algorithms is None:
-            self.algorithms = ["nn"]
-        self.colour_spaces = colour_space_models
-        if self.colour_spaces is None:
-            self.colour_spaces = ["vis"]
-        self.colour_space_names = []
-        for i in self.colour_spaces:
-            if isinstance(i, str):
-                self.colour_space_names.append(i)
-            elif type(i) is dict:
-                self.colour_space_names.append(i["cspace"])
         self.verbose = verbose
-        self.summary = np.zeros((len(self.colour_spaces) * len(self.datasets), len(self.algorithms)))
+        self.summary = np.zeros(len(self.configs))
         self.summary_file = f"results/{prefix}_summary.csv"
         self.details_file = f"results/{prefix}_details.csv"
         self.log_file = f"results/{prefix}_log.txt"
@@ -44,7 +30,7 @@ class Evaluator:
 
         self.summary_index = self.create_summary_index()
 
-        self.details = np.zeros((len(self.datasets)*self.folds*self.repeat, len(self.algorithms) * len(self.colour_spaces)))
+        self.details = np.zeros((self.folds*self.repeat, len(self.configs)))
         self.details_index = self.get_details_index()
         self.details_columns = self.get_details_columns()
         self.summary_columns = self.get_summary_columns()
@@ -58,41 +44,33 @@ class Evaluator:
 
     def get_details_columns(self):
         details_columns = []
-        for algorithm in self.algorithms:
-            for colour_space in self.colour_spaces:
-                details_columns.append(f"{self.get_alg_name(algorithm)}-{self.get_cspace_name(colour_space)}")
+        for config in self.configs:
+            details_columns.append(f"{self.get_config_name(config)}")
         return details_columns
 
     def get_summary_columns(self):
-        details_columns = []
-        for algorithm in self.algorithms:
-            details_columns.append(f"{self.get_alg_name(algorithm)}")
-        return details_columns
-
+        summary_columns = []
+        for config in self.configs:
+            summary_columns.append(f"{self.get_config_name(config)}")
+        return summary_columns
 
     def get_details_index(self):
         details_index = []
-        for index_dataset, dataset in enumerate(self.datasets):
-            for i in range(self.repeat):
-                for fold in range(self.folds):
-                    details_index.append(f"{dataset}-{i}-{fold}")
+        for i in range(self.repeat):
+            for fold in range(self.folds):
+                details_index.append(f"{i}-{fold}")
         return details_index
 
-    def get_details_row(self, index_dataset, itr_no):
-        return index_dataset*self.folds*self.repeat + itr_no
+    def get_details_row(self, repeat_number, fold_number):
+        return self.folds*repeat_number + fold_number
 
-    def get_details_column(self, index_algorithm, index_colour_space):
-        return len(self.colour_spaces) * index_algorithm + index_colour_space
+    def set_details(self, index_config, repeat_number, fold_number, score):
+        details_row = self.get_details_row(repeat_number, fold_number)
+        self.details[details_row][index_config] = score
 
-    def set_details(self, index_algorithm, index_colour_space, index_dataset, it_now, score):
-        details_row = self.get_details_row(index_dataset, it_now)
-        details_column = self.get_details_column(index_algorithm, index_colour_space)
-        self.details[details_row][details_column] = score
-
-    def get_details(self, index_algorithm, index_colour_space, index_dataset, it_now):
-        details_row = self.get_details_row(index_dataset, it_now)
-        details_column = self.get_details_column(index_algorithm, index_colour_space)
-        return self.details[details_row][details_column]
+    def get_details(self, index_config, repeat_number, fold_number):
+        details_row = self.get_details_row(repeat_number, fold_number)
+        return self.details[details_row][index_config]
 
     def sync_summary_file(self):
         if not os.path.exists(self.summary_file):
@@ -123,35 +101,22 @@ class Evaluator:
         df = pd.DataFrame(data=self.details, columns=self.details_columns, index=self.details_index)
         df.to_csv(self.details_file)
 
-
-    def get_summary_row(self, index_dataset, index_colour_space):
-        return (index_dataset*len(self.colour_spaces)) + index_colour_space
-
-    def log_scores(self, dataset, algorithm, colour_space, r2s):
+    def log_scores(self, config, r2s):
         log_file = open(self.log_file, "a")
-        log_file.write(f"\n{dataset} - {algorithm} - {colour_space}\n")
+        log_file.write(f"\n{self.get_config_name(config)}\n")
         log_file.write(str(r2s))
         log_file.write("\n")
         log_file.close()
 
-    def set_score(self, index_dataset, index_algorithm, index_colour_space, score):
-        row = self.get_summary_row(index_dataset, index_colour_space)
-        self.summary[row][index_algorithm] = score
+    def set_score(self, index_config, score):
+        self.summary[index_config] = score
 
-    def get_score(self, index_dataset, index_algorithm, index_colour_space):
-        row = self.get_summary_row(index_dataset, index_colour_space)
-        return self.summary[row][index_algorithm]
+    def get_score(self, index_config):
+        return self.summary[index_config]
 
     @staticmethod
-    def get_cspace_name(colour_space):
-        if type(colour_space) is dict:
-            if "name" in colour_space:
-                if colour_space["name"] is not None:
-                    return colour_space["name"]
-            else:
-                return f"{colour_space['cspace']}"
-        if isinstance(colour_space, str):
-            return colour_space
+    def get_config_name(config):
+        return "-".join(config.x)+"_"+config.y
 
     @staticmethod
     def get_alg_type(alg):
@@ -177,113 +142,68 @@ class Evaluator:
             return alg
         return {}
 
+    def process(self):
+        for index_config, config in enumerate(self.configs):
+            self.process_config(config)
+        self.calculate_mean()
 
-    def process_algorithm_colour_space_dataset(self, index_algorithm, index_colour_space, index_dataset):
-        algorithm = self.algorithms[index_algorithm]
-        colour_space = self.colour_spaces[index_colour_space]
-        dataset = self.datasets[index_dataset]
+    def process_config(self, index_config):
+        config = self.configs[index_config]
 
-        print("Start", f"{dataset} - {self.get_alg_name(algorithm)} - {self.get_cspace_name(colour_space)}")
+        print("Start", f"{self.get_config_name(config)}")
 
-        if self.get_score(index_dataset, index_algorithm, index_colour_space) != 0:
-            print(f"{dataset} - {algorithm} - {colour_space} Was done already")
+        if self.get_score(index_config) != 0:
+            print(f"{self.get_config_name(config)} Was done already")
         else:
-            scores = self.calculate_scores_folds(index_algorithm, index_colour_space, index_dataset)
+            scores = self.calculate_scores_folds(index_config)
             score_mean = np.round(np.mean(scores), 3)
             scores = np.round(scores, 3)
-            self.log_scores(dataset, algorithm, colour_space, scores)
-            self.set_score(index_dataset, index_algorithm, index_colour_space, score_mean)
+            self.log_scores(config, scores)
+            self.set_score(index_config, score_mean)
             self.write_summary()
-
-    def process_algorithm_colour_space(self, index_algorithm, index_colour_space):
-        for index_dataset, dataset in enumerate(self.datasets):
-            self.process_algorithm_colour_space_dataset(index_algorithm, index_colour_space, index_dataset)
-
-    def process_algorithm(self, index_algorithm):
-        for index_colour_space, colour_space in enumerate(self.colour_spaces):
-            self.process_algorithm_colour_space(index_algorithm, index_colour_space)
-
-    def process(self):
-        for index_algorithm, algorithm in enumerate(self.algorithms):
-            self.process_algorithm(index_algorithm)
-        self.calculate_mean()
 
     def create_summary_index(self):
         index = []
-        for dataset in self.datasets:
-            for colour_space in self.colour_spaces:
-                name = self.get_cspace_name(colour_space)
-
-                index.append(f"{dataset} - {name}")
+        for config in self.configs:
+            name = self.get_config_name(config)
+            index.append(f"{name}")
         return index
 
     def create_mean_index(self):
         index = []
-        for colour_space in self.colour_spaces:
-            name = self.get_cspace_name(colour_space)
+        for config in self.configs:
+            name = self.get_config_name(config)
             index.append(name)
         return index
 
-    def calculate_scores_folds(self, index_algorithm, index_colour_space, index_dataset):
-        algorithm = self.algorithms[index_algorithm]
-        colour_space = self.colour_spaces[index_colour_space]
-        dataset = self.datasets[index_dataset]
+    def calculate_scores_folds(self, index_config):
+        config = self.configs[index_config]
         scores = []
-        for i in range(self.repeat):
-            if type(colour_space) is dict:
-                ds = ds_manager.DSManager(dataset, **colour_space, random_state=i, folds=self.folds)
-            else:
-                ds = ds_manager.DSManager(dataset, colour_space, random_state=i, folds=self.folds)
+        for repeat_number in range(self.repeat):
+            ds = ds_manager.DSManager(folds=self.folds, x=config.x, y=config.y)
 
-            for itr_no, (train_ds, test_ds) in enumerate(ds.get_k_folds()):
-                it_now = i*self.folds + itr_no
-                score = self.get_details(index_algorithm, index_colour_space, index_dataset, it_now)
+            for fold_number, (train_ds, test_ds) in enumerate(ds.get_k_folds()):
+                score = self.get_details(index_config, repeat_number, fold_number)
                 if score != 0:
-                    print(f"{it_now} done already")
+                    print(f"{repeat_number}-{fold_number} done already")
                 else:
-                    score = self.calculate_score(train_ds, test_ds, algorithm)
+                    score = self.calculate_score(train_ds, test_ds)
                 if self.verbose:
                     print(score)
                 scores.append(score)
-                self.set_details(index_algorithm, index_colour_space, index_dataset, it_now, score)
+                self.set_details(index_config, repeat_number, fold_number, score)
                 self.write_details()
         return scores
 
-    def calculate_score(self, train_ds, test_ds, algorithm):
+    def calculate_score(self, train_ds, test_ds):
         if self.TEST:
             self.TEST_SCORE = self.TEST_SCORE + 1
             return self.TEST_SCORE
 
-        model_instance = None
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model_instance = train(device, train_ds)
+        return test(device, test_ds, model_instance)
 
-        algorithm_type = self.get_alg_type(algorithm)
-        nn_config = self.get_nn_config(algorithm)
-
-        if algorithm_type == "nn":
-            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-            model_instance = train(device, train_ds, nn_config = nn_config)
-            return test(device, test_ds, model_instance)
-        else:
-            train_x = train_ds.get_x()
-            train_y = train_ds.get_y()
-            test_x = test_ds.get_x()
-            test_y = test_ds.get_y()
-
-            if algorithm_type == "lr":
-                model_instance = LinearRegression()
-            elif algorithm_type == "plsr":
-                size = train_x.shape[1]//2
-                if size == 0:
-                    size = 1
-                model_instance = PLSRegression(n_components=size)
-            elif algorithm_type == "rf":
-                model_instance = RandomForestRegressor(max_depth=4, n_estimators=100)
-            elif algorithm_type == "svr":
-                model_instance = SVR()
-
-
-            model_instance = model_instance.fit(train_x, train_y)
-            return model_instance.score(test_x, test_y)
 
     def calculate_mean(self):
         mean = np.zeros((len(self.colour_spaces), len(self.algorithms)))
@@ -304,6 +224,6 @@ class Evaluator:
 
 
 if __name__ == "__main__":
-    ev = Evaluator(calc_mean=True)
+    ev = Evaluator()
     ev.process()
     print("Done all")

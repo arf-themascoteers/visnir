@@ -4,7 +4,7 @@ from torch.utils.data import DataLoader
 from sklearn.metrics import r2_score
 import time
 
-def test(device, ds, model, return_pred = False, shuffle=True):
+def test(device, ds, model, return_pred = False, shuffle=False):
     batch_size = 30000
     dataloader = DataLoader(ds, batch_size=batch_size, shuffle=shuffle)
     model.eval()
