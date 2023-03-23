@@ -7,16 +7,15 @@ from sklearn.model_selection import KFold
 
 
 class DSManager:
-    def __init__(self, dt, name=None, folds=10, x=None, y="oc"):
+    def __init__(self, name=None, folds=10, x=None, y="oc"):
         if x is None:
             x = ["665", "560", "490"]
         self.x = x
         self.y = y
         self.name = name
         self.folds = folds
-        self.dt = dt
 
-        csv_file_location = f"data/{dt}/vis.csv"
+        csv_file_location = f"data/vis.csv"
         df = pd.read_csv(csv_file_location)
         columns = x + [y]
         df = df[columns]
