@@ -1,7 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
 from model_ann import ANN
-import time
 
 
 def train(device, ds, model=None, nn_config=None):
@@ -30,9 +29,6 @@ def train(device, ds, model=None, nn_config=None):
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=0.001)
     criterion = torch.nn.MSELoss(reduction='sum')
     n_batches = int(len(ds)/batch_size) + 1
-    batch_number = 0
-    loss = None
-    start = time.time()
     for epoch in range(num_epochs):
         batch_number = 0
         for (x, y) in dataloader:
@@ -48,8 +44,3 @@ def train(device, ds, model=None, nn_config=None):
             #print(f'Epoch:{epoch + 1} (of {num_epochs}), Batch: {batch_number} of {n_batches}, Loss:{loss.item():.6f}')
 
     return model
-
-#
-# if __name__ == "__main__":
-#     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-#     train(device)

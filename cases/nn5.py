@@ -9,7 +9,6 @@ if __name__ == "__main__":
         algorithms=["nn"],
         colour_space_models=["vis"],
         prefix="j",
-        folds=3,
         verbose=True
     )
     ev.process()

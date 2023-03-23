@@ -15,11 +15,12 @@ class DSManager:
     
     def __init__(self, dt, cspace, si=None, si_only=False,
                  normalize = True, random_state=0,
-                 name=None, folds=10, clip_soc=0
+                 name=None, folds=10, clip_soc=0, nsoc = False
                  ):
         self.name = name
         self.folds = folds
         self.dt = dt
+        self.nsoc = nsoc
 
         if si is None:
             si = []
