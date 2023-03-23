@@ -39,6 +39,18 @@ def test(device, ds, model, machine=None, return_pred = False, shuffle=False):
             if return_pred:
                 return r2, y_hat
             return r2
+    elif machine == "annl2":
+        for (x, y, intermediate) in dataloader:
+            x = x.to(device)
+            y = y.to(device)
+            y_hat = model(x)
+            y_hat = y_hat.reshape(-1)
+            y = y.detach().cpu().numpy()
+            y_hat = y_hat.detach().cpu().numpy()
+            r2 = r2_score(y, y_hat)
+            if return_pred:
+                return r2, y_hat
+            return r2
     else:
         for (x, y) in dataloader:
             x = x.to(device)
