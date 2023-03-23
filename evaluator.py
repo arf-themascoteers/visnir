@@ -121,20 +121,23 @@ class Evaluator:
             if score != 0:
                 print(f"{repeat_number}-{fold_number} done already")
             else:
-                score = self.calculate_score(train_ds, test_ds)
+                machine = "ann"
+                if "machine" in config:
+                    machine = config["machine"]
+                score = self.calculate_score(train_ds, test_ds, machine)
                 self.log_scores(repeat_number, fold_number, config, score)
             if self.verbose:
                 print(score)
             self.set_details(index_config, repeat_number, fold_number, score)
             self.write_details()
 
-    def calculate_score(self, train_ds, test_ds):
+    def calculate_score(self, train_ds, test_ds, machine):
         if self.TEST:
             self.TEST_SCORE = self.TEST_SCORE + 1
             return self.TEST_SCORE
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model_instance = train(device, train_ds)
+        model_instance = train(device, train_ds, machine)
         return test(device, test_ds, model_instance)
 
     def create_summary_index(self):
