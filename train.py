@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
-from model_ann import ANN
+from ann import ANN
 
 
 def train(device, ds, model=None, nn_config=None):

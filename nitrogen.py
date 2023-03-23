@@ -2,7 +2,7 @@ import ds_manager
 import torch
 from train import train
 from test import test
-from model_ann import ANN
+from ann import ANN
 from n_ann import PHH_ANN
 from ann_nsoc import NSOC_ANN
 

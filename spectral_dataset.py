@@ -3,13 +3,10 @@ from torch.utils.data import Dataset
 
 
 class SpectralDataset(Dataset):
-    def __init__(self, source, nsoc = False):
+    def __init__(self, source):
         self.df = source
-        self.x = source[:,0:3]
+        self.x = source[:,0:-1]
         self.y = source[:,-1]
-        self.nsoc = nsoc
-        if self.nsoc:
-            self.nitrogen = source[:,-1]
 
     def __len__(self):
         return len(self.df)
