@@ -8,7 +8,7 @@ class ANN(nn.Module):
         self.fc = nn.Sequential(
             nn.Linear(size, 20),
             nn.LeakyReLU(),
-            nn.Linear(10,1)
+            nn.Linear(20,1)
         )
 
     def forward(self, x):
