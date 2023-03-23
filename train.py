@@ -13,33 +13,33 @@ def train(device, ds:SpectralDataset, machine="ann"):
     num_epochs = 200
     batch_size = 600
     lr = 0.001
-    dataloader = DataLoader(ds, batch_size=batch_size, shuffle=True)
     x_size = ds.get_x().shape[1]
     if machine == "ann":
         model = ANN(size=x_size)
     elif machine == "annmini":
         model = ANN_Mini(size=x_size-1)
-        y = ds.x[-2]
-        x = ds.x[0:-2]
+        y = ds.x[:,-1]
+        x = ds.x[:,0:-1]
         ds = SpectralDataset(x=x, y=y)
     elif machine == "anni":
         minimodel = train(device, ds, machine="annmini")
         model = ANNI(size=x_size-1, mini=minimodel)
         y = ds.y
-        x = ds.x[0:-1]
+        x = ds.x[:,0:-1]
         ds = SpectralDataset(x=x, y=y)
     elif machine == "annl1":
         model = ANN_L1(size=x_size-1)
         y = ds.y
-        x = ds.x[0:-1]
-        intermediate = ds.x[-1]
+        x = ds.x[:,0:-1]
+        intermediate = ds.x[:,-1]
         ds = SpectralDataset(x=x, y=y, intermediate=intermediate)
     elif machine == "annl2":
         model = ANN_L2(size=x_size-1)
         y = ds.y
-        x = ds.x[0:-1]
-        intermediate = ds.x[-1]
+        x = ds.x[:,0:-1]
+        intermediate = ds.x[:,-1]
         ds = SpectralDataset(x=x, y=y, intermediate=intermediate)
+    dataloader = DataLoader(ds, batch_size=batch_size, shuffle=True)
     model.train()
     model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=0.001)

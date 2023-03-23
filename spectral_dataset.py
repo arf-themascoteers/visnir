@@ -1,14 +1,15 @@
 import torch
 from torch.utils.data import Dataset
+import numpy as np
 
 
 class SpectralDataset(Dataset):
     def __init__(self, source=None, x=None, y=None, intermediate=None):
         if x is not None and y is not None:
-            y = torch.unsqueeze(y, dim=1)
-            self.df = torch.concatenate((x,y), dim=1)
-        else:
-            self.df = source
+            y = np.expand_dims(y, axis=1)
+            source = np.concatenate((x,y), axis=1)
+
+        self.df = source
         self.x = source[:,0:-1]
         self.y = source[:,-1]
         self.intermediate = intermediate
