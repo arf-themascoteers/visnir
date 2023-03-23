@@ -11,9 +11,9 @@ class ANN_L1(nn.Module):
             nn.Linear(10, 5)
         )
         self.n = nn.Sequential(
-            nn.Linear(6,3),
+            nn.Linear(size,5),
             nn.LeakyReLU(),
-            nn.Linear(3,1)
+            nn.Linear(5,1)
         )
         self.soc = nn.Sequential(
             nn.Linear(6,3),

@@ -62,7 +62,7 @@ def train(device, ds:SpectralDataset, machine="ann"):
                 optimizer.step()
                 optimizer.zero_grad()
                 batch_number += 1
-        if machine == "annl2":
+        elif machine == "annl2":
             for (x, y, intermediate) in dataloader:
                 x = x.to(device)
                 y = y.to(device)
