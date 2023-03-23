@@ -5,8 +5,7 @@ from ann import ANN
 
 def train(device, ds, model=None):
     torch.manual_seed(0)
-    TEST = False
-    num_epochs = 300
+    num_epochs = 200
     batch_size = 600
     lr = 0.001
     dataloader = DataLoader(ds, batch_size=batch_size, shuffle=True)
