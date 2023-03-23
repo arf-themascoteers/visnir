@@ -1,9 +1,28 @@
 from torch.utils.data import DataLoader
 from sklearn.metrics import r2_score
+from spectral_dataset import SpectralDataset
+import numpy as np
 
 
-def test(device, ds, model, return_pred = False, shuffle=False):
+def test(device, ds, model, machine=None, return_pred = False, shuffle=False):
     batch_size = 30000
+    if machine == "annmini":
+        y = ds.x[:,-1]
+        x = ds.x[:,0:-1]
+        ds = SpectralDataset(x=x, y=y)
+    elif machine == "anni":
+        y = ds.y
+        x = ds.x[:,0:-1]
+        ds = SpectralDataset(x=x, y=y)
+    elif machine == "annl1":
+        y = ds.y
+        x = ds.x[:,0:-1]
+        ds = SpectralDataset(x=x, y=y, intermediate=np.zeros_like(y))
+    elif machine == "annl2":
+        y = ds.y
+        x = ds.x[:,0:-1]
+        ds = SpectralDataset(x=x, y=y, intermediate=np.zeros_like(y))
+
     dataloader = DataLoader(ds, batch_size=batch_size, shuffle=shuffle)
     model.eval()
     model.to(device)
