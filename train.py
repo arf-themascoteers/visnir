@@ -4,6 +4,7 @@ from ann import ANN
 from anni import ANNI
 from annmini import ANN_Mini
 from annl1 import ANN_L1
+from annl2 import ANN_L2
 from spectral_dataset import SpectralDataset
 
 
@@ -33,6 +34,12 @@ def train(device, ds:SpectralDataset, machine="ann"):
         x = ds.x[0:-1]
         intermediate = ds.x[-1]
         ds = SpectralDataset(x=x, y=y, intermediate=intermediate)
+    elif machine == "annl2":
+        model = ANN_L2(size=x_size-1)
+        y = ds.y
+        x = ds.x[0:-1]
+        intermediate = ds.x[-1]
+        ds = SpectralDataset(x=x, y=y, intermediate=intermediate)
     model.train()
     model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=0.001)
@@ -54,6 +61,25 @@ def train(device, ds:SpectralDataset, machine="ann"):
                 loss.backward()
                 optimizer.step()
                 optimizer.zero_grad()
+                batch_number += 1
+        if machine == "annl2":
+            for (x, y, intermediate) in dataloader:
+                x = x.to(device)
+                y = y.to(device)
+                intermediate = intermediate.to(device)
+                y_hat = model(x)
+                y_hat = y_hat.reshape(-1)
+                loss_y = criterion(y_hat, y)
+                loss_y.backward()
+                optimizer.step()
+                optimizer.zero_grad()
+
+                intermediate_hat = model.n_only(x)
+                loss_intermediate = criterion(intermediate_hat, intermediate)
+                loss_intermediate.backward()
+                optimizer.step()
+                optimizer.zero_grad()
+
                 batch_number += 1
         else:
             for (x, y) in dataloader:

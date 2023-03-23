@@ -13,7 +13,7 @@ if __name__ == "__main__":
         cofigs=configs,
         repeat=1,
         folds=2,
-        prefix="all"
+        prefix="l2"
     )
     ev.process()
     print("Done all")
