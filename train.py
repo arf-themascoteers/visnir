@@ -55,6 +55,7 @@ def train(device, ds:SpectralDataset, machine="ann"):
                 intermediate = intermediate.to(device)
                 y_hat, intermediate_hat = model(x)
                 y_hat = y_hat.reshape(-1)
+                intermediate_hat = intermediate_hat.reshape(-1)
                 loss_y = criterion(y_hat, y)
                 loss_intermediate = criterion(intermediate_hat, intermediate)
                 loss = loss_y + alpha * loss_intermediate
@@ -75,6 +76,7 @@ def train(device, ds:SpectralDataset, machine="ann"):
                 optimizer.zero_grad()
 
                 intermediate_hat = model.n_only(x)
+                intermediate_hat = intermediate_hat.reshape(-1)
                 loss_intermediate = criterion(intermediate_hat, intermediate)
                 loss_intermediate.backward()
                 optimizer.step()
