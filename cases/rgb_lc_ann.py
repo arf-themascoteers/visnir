@@ -18,7 +18,7 @@ if __name__ == "__main__":
         file_name="vis_ells",
         repeat=1,
         folds=10,
-        prefix="lc_ann"
+        prefix="rgb_lc_ann"
     )
     ev.process()
     print("Done all")
