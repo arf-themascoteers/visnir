@@ -14,7 +14,7 @@ def train(device, ds:SpectralDataset, machine="ann"):
     if machine == "ann":
         model = ANN(size=x_size)
     elif machine == "annx":
-        model = ANNX(size=x_size)
+        model = ANNX(size=x_size, intermediate=ds.get_intermediate().shape[1])
     dataloader = DataLoader(ds, batch_size=batch_size, shuffle=True)
     model.train()
     model.to(device)
@@ -27,12 +27,12 @@ def train(device, ds:SpectralDataset, machine="ann"):
         for (x, intermediate, y) in dataloader:
             x = x.to(device)
             y = y.to(device)
-            intermediate = intermediate.to(device)
-            y_hat = model(x)
-            y_hat = y_hat.reshape(-1)
             if machine == "ann":
+                y_hat = model(x)
+                y_hat = y_hat.reshape(-1)
                 loss = criterion(y_hat, y)
             else:#annx
+                intermediate = intermediate.to(device)
                 y_hat, intermediate_hat = model(x)
                 y_hat = y_hat.reshape(-1)
                 loss_y = criterion(y_hat, y)
