@@ -89,6 +89,6 @@ class DSManager:
                 indices.append(index)
             else:
                 for i in columns:
-                    if i.startswith(f"{col}_"):
+                    if col.startswith(f"{i}_"):
                         indices.append(index)
         return indices
