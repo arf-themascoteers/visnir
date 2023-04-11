@@ -14,7 +14,7 @@ class Evaluator:
                  ):
         if file_name is None:
             file_name = "vis"
-            self.file_name = file_name
+        self.file_name = file_name
         if cofigs is None:
             cofigs = [{"x":["665", "560", "490"], "y":"oc"}]
         self.configs = cofigs
