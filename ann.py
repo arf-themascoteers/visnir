@@ -5,13 +5,26 @@ import torch.nn as nn
 class ANN(nn.Module):
     def __init__(self, size=3):
         super().__init__()
-        self.fc = nn.Sequential(
-            nn.Linear(size, 20),
+        self.soc_vec = nn.Sequential(
+            nn.Linear(size, 10),
             nn.LeakyReLU(),
-            nn.Linear(20,1)
+            nn.Linear(10, 5)
+        )
+        self.n = nn.Sequential(
+            nn.Linear(size,5),
+            nn.LeakyReLU(),
+            nn.Linear(5,1)
+        )
+        self.soc = nn.Sequential(
+            nn.Linear(6,3),
+            nn.LeakyReLU(),
+            nn.Linear(3,1)
         )
 
     def forward(self, x):
-        x = self.fc(x)
+        x1 = self.soc_vec(x)
+        x2 = self.n(x)
+        x = torch.hstack((x1,x2))
+        x = self.soc(x)
         return x
 

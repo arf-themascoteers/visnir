@@ -9,7 +9,7 @@ from spectral_dataset import SpectralDataset
 
 
 def train(device, ds:SpectralDataset, machine="ann"):
-    torch.manual_seed(0)
+    torch.manual_seed(1)
     num_epochs = 200
     batch_size = 600
     lr = 0.001

@@ -21,7 +21,7 @@ class DSManager:
         df = df[columns]
         npdf = df.to_numpy()
         npdf = self._normalize(npdf)
-        train, test = model_selection.train_test_split(npdf, test_size=0.2, random_state=1)
+        train, test = model_selection.train_test_split(npdf, test_size=0.2, random_state=2)
         self.full_data = np.concatenate((train, test), axis=0)
         self.full_ds = SpectralDataset(self.full_data)
         self.train_ds = SpectralDataset(train)
