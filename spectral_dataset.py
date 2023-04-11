@@ -5,6 +5,9 @@ import numpy as np
 
 class SpectralDataset(Dataset):
     def __init__(self, source=None, x=None, y=None, intermediate=None):
+        if intermediate is None:
+            intermediate = []
+        self.intermediate = intermediate
         if x is not None and y is not None:
             y = np.expand_dims(y, axis=1)
             source = np.concatenate((x,y), axis=1)
@@ -12,18 +15,19 @@ class SpectralDataset(Dataset):
         self.df = source
         self.x = source[:,0:-1]
         self.y = source[:,-1]
-        self.intermediate = intermediate
+
 
     def __len__(self):
         return len(self.df)
 
     def __getitem__(self, idx):
-        this_x = self.get_x()[idx]
-        soc = self.get_y()[idx]
-        if self.intermediate is None:
-            return torch.tensor(this_x, dtype=torch.float32), torch.tensor(soc, dtype=torch.float32)
-        else:
-            return torch.tensor(this_x, dtype=torch.float32), torch.tensor(soc, dtype=torch.float32), torch.tensor(self.intermediate[idx], dtype=torch.float32)
+        this_x = torch.tensor(self.x[idx], dtype=torch.float32)
+        soc = torch.tensor(self.y[idx], dtype=torch.float32)
+        items = [this_x, soc]
+        for item_index in self.intermediate:
+            this_item = self.x[item_index]
+            items.append(torch.tensor(this_item, dtype=torch.float32))
+        return items
 
     def get_y(self):
         return self.y

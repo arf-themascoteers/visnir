@@ -16,7 +16,7 @@ class Evaluator:
             file_name = "vis"
         self.file_name = file_name
         if cofigs is None:
-            cofigs = [{"x":["665", "560", "490"], "y":"oc"}]
+            cofigs = [{"x":["665", "560", "490"], "intermediate":[], "y":"oc"}]
         self.configs = cofigs
         self.repeat = repeat
         self.folds = folds
@@ -120,7 +120,11 @@ class Evaluator:
         min_row = 0
         if "min_row" in config:
             min_row = config["min_row"]
-        ds = ds_manager.DSManager(folds=self.folds, x=config["x"], y=config["y"], file_name=self.file_name, min_row=min_row)
+        intermediate = []
+        if "intermediate" in config:
+            intermediate = config["intermediate"]
+        ds = ds_manager.DSManager(folds=self.folds, x=config["x"], y=config["y"], file_name=self.file_name,
+                                  min_row=min_row, intermediate=intermediate)
 
         for fold_number, (train_ds, test_ds) in enumerate(ds.get_k_folds()):
             score = self.get_details(index_config, repeat_number, fold_number)
