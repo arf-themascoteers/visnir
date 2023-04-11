@@ -38,7 +38,7 @@ class DSManager:
             if not is_numeric_dtype(df[col]):
                 newdf = newdf.drop(col, axis=1)
                 y = pd.get_dummies(df[col], prefix=col)
-                newdf = pd.concat([newdf, y], axis=1)
+                newdf = pd.concat([y,newdf], axis=1)
 
         return newdf
 
