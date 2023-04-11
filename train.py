@@ -1,10 +1,7 @@
 import torch
 from torch.utils.data import DataLoader
 from ann import ANN
-from anni import ANNI
-from annmini import ANN_Mini
-from annl1 import ANN_L1
-from annl2 import ANN_L2
+from annx import ANNX
 from spectral_dataset import SpectralDataset
 
 
@@ -16,25 +13,8 @@ def train(device, ds:SpectralDataset, machine="ann"):
     x_size = ds.get_x().shape[1]
     if machine == "ann":
         model = ANN(size=x_size)
-    elif machine == "annmini":
-        model = ANN_Mini(size=x_size-1)
-        y = ds.x[:,-1]
-        x = ds.x[:,0:-1]
-        ds = SpectralDataset(x=x, y=y)
-    elif machine == "anni":
-        minimodel = train(device, ds, machine="annmini")
-        model = ANNI(size=x_size-1, mini=minimodel)
-        y = ds.y
-        x = ds.x[:,0:-1]
-        ds = SpectralDataset(x=x, y=y)
-    elif machine == "annl1":
-        model = ANN_L1(size=x_size-1)
-        y = ds.y
-        x = ds.x[:,0:-1]
-        intermediate = ds.x[:,-1]
-        ds = SpectralDataset(x=x, y=y, intermediate=intermediate)
-    elif machine == "annl2":
-        model = ANN_L2(size=x_size-1)
+    elif machine == "annx":
+        model = ANNX(size=x_size - 1)
         y = ds.y
         x = ds.x[:,0:-1]
         intermediate = ds.x[:,-1]
@@ -48,7 +28,18 @@ def train(device, ds:SpectralDataset, machine="ann"):
     alpha = 0.3
     for epoch in range(num_epochs):
         batch_number = 0
-        if machine == "annl1":
+        if machine == "ann":
+            for (x, y) in dataloader:
+                x = x.to(device)
+                y = y.to(device)
+                y_hat = model(x)
+                y_hat = y_hat.reshape(-1)
+                loss = criterion(y_hat, y)
+                loss.backward()
+                optimizer.step()
+                optimizer.zero_grad()
+                batch_number += 1
+        else:#annx
             for (x, y, intermediate) in dataloader:
                 x = x.to(device)
                 y = y.to(device)
@@ -63,37 +54,7 @@ def train(device, ds:SpectralDataset, machine="ann"):
                 optimizer.step()
                 optimizer.zero_grad()
                 batch_number += 1
-        elif machine == "annl2":
-            for (x, y, intermediate) in dataloader:
-                x = x.to(device)
-                y = y.to(device)
-                intermediate = intermediate.to(device)
-                y_hat = model(x)
-                y_hat = y_hat.reshape(-1)
-                loss_y = criterion(y_hat, y)
-                loss_y.backward()
-                optimizer.step()
-                optimizer.zero_grad()
 
-                intermediate_hat = model.n_only(x)
-                intermediate_hat = intermediate_hat.reshape(-1)
-                loss_intermediate = criterion(intermediate_hat, intermediate)
-                loss_intermediate.backward()
-                optimizer.step()
-                optimizer.zero_grad()
-
-                batch_number += 1
-        else:
-            for (x, y) in dataloader:
-                x = x.to(device)
-                y = y.to(device)
-                y_hat = model(x)
-                y_hat = y_hat.reshape(-1)
-                loss = criterion(y_hat, y)
-                loss.backward()
-                optimizer.step()
-                optimizer.zero_grad()
-                batch_number += 1
         #print(f'Epoch:{epoch + 1} (of {num_epochs}), Batch: {batch_number} of {n_batches}, Loss:{loss.item():.6f}')
 
     return model

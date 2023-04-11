@@ -11,9 +11,9 @@ class ANNX(nn.Module):
             nn.Linear(10, 5)
         )
         self.n = nn.Sequential(
-            nn.Linear(6,3),
+            nn.Linear(size,5),
             nn.LeakyReLU(),
-            nn.Linear(3,1)
+            nn.Linear(5,1)
         )
         self.soc = nn.Sequential(
             nn.Linear(6,3),
@@ -26,5 +26,5 @@ class ANNX(nn.Module):
         x2 = self.n(x)
         x = torch.hstack((x1,x2))
         x = self.soc(x)
-        return x
+        return x, x2
 
