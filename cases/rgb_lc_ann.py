@@ -4,9 +4,10 @@ from evaluator import Evaluator
 
 
 if __name__ == "__main__":
+    rgb = ["665", "560", "490"]
     configs = []
     for property in ["lc1"]:
-        configs.append({"x":[property], "y":"oc", "machine":"ann"})
+        configs.append({"x":rgb+[property], "y":"oc", "machine":"ann"})
 
     ev = Evaluator(
         cofigs=configs,
