@@ -8,7 +8,8 @@ from pandas.api.types import is_numeric_dtype
 
 
 class DSManager:
-    def __init__(self, name=None, folds=10, x=None, y="oc",file_name=None):
+    def __init__(self, name=None, folds=10, x=None, y="oc",file_name=None, min_row=0):
+        self.min_row = min_row
         if file_name is None:
             file_name = "vis"
         if x is None:
@@ -22,7 +23,9 @@ class DSManager:
         df = pd.read_csv(csv_file_location)
         columns = x + [y]
         df = df[columns]
+        print(f"Initial rows {len(df)}")
         df = self.process_ohe(df)
+        print(f"OHE-Filtered rows {len(df)}")
         npdf = df.to_numpy()
         npdf = self._normalize(npdf)
         train, test = model_selection.train_test_split(npdf, test_size=0.2, random_state=2)
@@ -36,8 +39,12 @@ class DSManager:
 
         for col in df.columns:
             if not is_numeric_dtype(df[col]):
+                uniques = df[col].unique()
+                for a_value in uniques:
+                    if len(newdf[newdf[col] == a_value]) < self.min_row:
+                        newdf = newdf.drop(newdf[newdf.lc1 == a_value].index)
+                y = pd.get_dummies(newdf[col], prefix=col)
                 newdf = newdf.drop(col, axis=1)
-                y = pd.get_dummies(df[col], prefix=col)
                 newdf = pd.concat([y,newdf], axis=1)
 
         return newdf
