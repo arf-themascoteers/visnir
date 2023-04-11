@@ -50,7 +50,7 @@ class DSManager:
                 uniques = df[col].unique()
                 for a_value in uniques:
                     if len(newdf[newdf[col] == a_value]) < self.min_row:
-                        newdf = newdf.drop(newdf[newdf.lc1 == a_value].index)
+                        newdf = newdf.drop(newdf[newdf[col] == a_value].index)
                 y = pd.get_dummies(newdf[col], prefix=col)
                 ohe_offset = ohe_offset + len(y.columns)
                 newdf = newdf.drop(col, axis=1)
