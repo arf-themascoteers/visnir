@@ -5,7 +5,7 @@ from torch.utils.data import Dataset
 class SpectralDataset(Dataset):
     def __init__(self, source, x=None, intermediate=None):
         self.df = source
-        if x is not None:
+        if x is None:
             x = list(range(source.shape[1]-1))
         self.x = source[:,x]
 
