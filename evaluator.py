@@ -10,8 +10,11 @@ from test import test
 
 class Evaluator:
     def __init__(self, cofigs=None, prefix="", verbose=False,
-                 repeat=1, folds=10
+                 repeat=1, folds=10, file_name = None
                  ):
+        if file_name is None:
+            file_name = "vis"
+            self.file_name = file_name
         if cofigs is None:
             cofigs = [{"x":["665", "560", "490"], "y":"oc"}]
         self.configs = cofigs
@@ -114,7 +117,7 @@ class Evaluator:
     def process_config(self, repeat_number, index_config):
         config = self.configs[index_config]
         print("Start", f"{repeat_number}:{self.get_config_name(config)}")
-        ds = ds_manager.DSManager(folds=self.folds, x=config["x"], y=config["y"])
+        ds = ds_manager.DSManager(folds=self.folds, x=config["x"], y=config["y"], file_name=self.file_name)
 
         for fold_number, (train_ds, test_ds) in enumerate(ds.get_k_folds()):
             score = self.get_details(index_config, repeat_number, fold_number)

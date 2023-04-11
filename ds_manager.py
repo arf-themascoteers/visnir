@@ -4,10 +4,13 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 from sklearn.model_selection import KFold
+from pandas.api.types import is_numeric_dtype
 
 
 class DSManager:
-    def __init__(self, name=None, folds=10, x=None, y="oc"):
+    def __init__(self, name=None, folds=10, x=None, y="oc",file_name=None):
+        if file_name is None:
+            file_name = "vis"
         if x is None:
             x = ["665", "560", "490"]
         self.x = x
@@ -15,10 +18,11 @@ class DSManager:
         self.name = name
         self.folds = folds
 
-        csv_file_location = f"data/vis.csv"
+        csv_file_location = f"data/{file_name}.csv"
         df = pd.read_csv(csv_file_location)
         columns = x + [y]
         df = df[columns]
+        df = self.process_ohe(df)
         npdf = df.to_numpy()
         npdf = self._normalize(npdf)
         train, test = model_selection.train_test_split(npdf, test_size=0.2, random_state=2)
@@ -27,19 +31,16 @@ class DSManager:
         self.train_ds = SpectralDataset(train)
         self.test_ds = SpectralDataset(test)
 
-    @staticmethod
-    def equalize_datasets(ds1: SpectralDataset, ds2: SpectralDataset):
-        d1 = ds1.df
-        d2 = ds2.df
-        size = min(d1.shape[0], d2.shape[0])
-        return SpectralDataset(d1[0:size,:]), SpectralDataset(d2[0:size,:])
+    def process_ohe(self, df):
+        newdf = df.copy()
 
-    @staticmethod
-    def minify_datasets(ds: SpectralDataset, factor):
-        d = ds.df
-        size = d.shape[0]
-        size = int(size*factor)
-        return SpectralDataset(d[0:size,:])
+        for col in df.columns:
+            if not is_numeric_dtype(df[col]):
+                newdf = newdf.drop(col, axis=1)
+                y = pd.get_dummies(df[col], prefix=col)
+                newdf = pd.concat([newdf, y], axis=1)
+
+        return newdf
 
     def get_test_ds(self):
         return self.test_ds
@@ -59,8 +60,6 @@ class DSManager:
 
     def _normalize(self, data):
         for i in range(data.shape[1]):
-            # if i != data.shape[1]-1:
-            #     continue
             scaler = MinMaxScaler()
             x_scaled = scaler.fit_transform(data[:,i].reshape(-1, 1))
             data[:,i] = np.squeeze(x_scaled)
