@@ -14,11 +14,7 @@ def train(device, ds:SpectralDataset, machine="ann"):
     if machine == "ann":
         model = ANN(size=x_size)
     elif machine == "annx":
-        model = ANNX(size=x_size - 1)
-        y = ds.y
-        x = ds.x[:,0:-1]
-        intermediate = ds.x[:,-1]
-        ds = SpectralDataset(x=x, y=y, intermediate=intermediate)
+        model = ANNX(size=x_size)
     dataloader = DataLoader(ds, batch_size=batch_size, shuffle=True)
     model.train()
     model.to(device)
@@ -28,33 +24,24 @@ def train(device, ds:SpectralDataset, machine="ann"):
     alpha = 0.3
     for epoch in range(num_epochs):
         batch_number = 0
-        if machine == "ann":
-            for (x, y) in dataloader:
-                x = x.to(device)
-                y = y.to(device)
-                y_hat = model(x)
-                y_hat = y_hat.reshape(-1)
+        for (x, intermediate, y) in dataloader:
+            x = x.to(device)
+            y = y.to(device)
+            intermediate = intermediate.to(device)
+            y_hat = model(x)
+            y_hat = y_hat.reshape(-1)
+            if machine == "ann":
                 loss = criterion(y_hat, y)
-                loss.backward()
-                optimizer.step()
-                optimizer.zero_grad()
-                batch_number += 1
-        else:#annx
-            for (x, y, intermediate) in dataloader:
-                x = x.to(device)
-                y = y.to(device)
-                intermediate = intermediate.to(device)
+            else:#annx
                 y_hat, intermediate_hat = model(x)
                 y_hat = y_hat.reshape(-1)
-                intermediate_hat = intermediate_hat.reshape(-1)
                 loss_y = criterion(y_hat, y)
                 loss_intermediate = criterion(intermediate_hat, intermediate)
                 loss = loss_y + alpha * loss_intermediate
-                loss.backward()
-                optimizer.step()
-                optimizer.zero_grad()
-                batch_number += 1
-
-        #print(f'Epoch:{epoch + 1} (of {num_epochs}), Batch: {batch_number} of {n_batches}, Loss:{loss.item():.6f}')
+            loss.backward()
+            optimizer.step()
+            optimizer.zero_grad()
+            batch_number += 1
+            #print(f'Epoch:{epoch + 1} (of {num_epochs}), Batch: {batch_number} of {n_batches}, Loss:{loss.item():.6f}')
 
     return model
