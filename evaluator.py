@@ -117,7 +117,10 @@ class Evaluator:
     def process_config(self, repeat_number, index_config):
         config = self.configs[index_config]
         print("Start", f"{repeat_number}:{self.get_config_name(config)}")
-        ds = ds_manager.DSManager(folds=self.folds, x=config["x"], y=config["y"], file_name=self.file_name, min_row=config["min_row"])
+        min_row = 0
+        if "min_row" in config:
+            min_row = config["min_row"]
+        ds = ds_manager.DSManager(folds=self.folds, x=config["x"], y=config["y"], file_name=self.file_name, min_row=min_row)
 
         for fold_number, (train_ds, test_ds) in enumerate(ds.get_k_folds()):
             score = self.get_details(index_config, repeat_number, fold_number)
