@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class ANNX(nn.Module):
-    def __init__(self, size=3):
+    def __init__(self, size=3,intermediate=1):
         super().__init__()
         self.soc_vec = nn.Sequential(
             nn.Linear(size, 10),
@@ -13,10 +13,10 @@ class ANNX(nn.Module):
         self.n = nn.Sequential(
             nn.Linear(size,5),
             nn.LeakyReLU(),
-            nn.Linear(5,1)
+            nn.Linear(5,intermediate)
         )
         self.soc = nn.Sequential(
-            nn.Linear(6,3),
+            nn.Linear(5 + intermediate,3),
             nn.LeakyReLU(),
             nn.Linear(3,1)
         )
