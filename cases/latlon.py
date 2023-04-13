@@ -7,13 +7,14 @@ if __name__ == "__main__":
     rgb = ["665", "560", "490"]
     configs = []
     configs.append({"x": rgb, "y": "oc"})
-    configs.append({"x": rgb + ["rr"], "y": "oc"})
+    configs.append({"x": rgb + ["lat","lon"], "y": "oc"})
+
 
     ev = Evaluator(
         cofigs=configs,
         repeat=1,
         folds=10,
-        prefix="rgb_rainfall",
+        prefix="latlon",
         files="data/with_rainfall.csv"
     )
     ev.process()
