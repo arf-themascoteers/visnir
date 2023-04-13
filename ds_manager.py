@@ -8,7 +8,7 @@ from pandas.api.types import is_numeric_dtype
 
 
 class DSManager:
-    def __init__(self, name=None, folds=10, x=None, y="oc",file_name=None, min_row=0, intermediate=None):
+    def __init__(self, name=None, folds=10, x=None, y="oc",min_row=0, intermediate=None):
         if x is None:
             x = ["665", "560", "490"]
         self.x = x
@@ -19,12 +19,10 @@ class DSManager:
         self.name = name
 
         self.min_row = min_row
-        if file_name is None:
-            file_name = "vis"
 
         self.folds = folds
 
-        csv_file_location = f"data/{file_name}.csv"
+        csv_file_location = f"data/vis_with_empty.csv"
         df = pd.read_csv(csv_file_location)
 
         columns = x + intermediate + [y]

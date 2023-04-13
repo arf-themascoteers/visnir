@@ -12,8 +12,7 @@ if __name__ == "__main__":
         cofigs=configs,
         repeat=1,
         folds=10,
-        prefix="single",
-        file_name="vis_ells"
+        prefix="single"
     )
     ev.process()
     print("Done all")

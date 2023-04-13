@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
     ev = Evaluator(
         cofigs=configs,
-        file_name="vis_css",
+        
         repeat=1,
         folds=10,
         prefix="rgb_oc"

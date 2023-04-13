@@ -10,11 +10,8 @@ from test import test
 
 class Evaluator:
     def __init__(self, cofigs=None, prefix="", verbose=False,
-                 repeat=1, folds=10, file_name = None
+                 repeat=1, folds=10
                  ):
-        if file_name is None:
-            file_name = "vis"
-        self.file_name = file_name
         if cofigs is None:
             cofigs = [{"x":["665", "560", "490"], "intermediate":[], "y":"oc"}]
         self.configs = cofigs
@@ -123,7 +120,7 @@ class Evaluator:
         intermediate = []
         if "intermediate" in config:
             intermediate = config["intermediate"]
-        ds = ds_manager.DSManager(folds=self.folds, x=config["x"], y=config["y"], file_name=self.file_name,
+        ds = ds_manager.DSManager(folds=self.folds, x=config["x"], y=config["y"],
                                   min_row=min_row, intermediate=intermediate)
 
         for fold_number, (train_ds, test_ds) in enumerate(ds.get_k_folds()):
