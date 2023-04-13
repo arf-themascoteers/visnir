@@ -8,7 +8,7 @@ if __name__ == "__main__":
     test_file = "data/with_empty.csv"
     rgb = ["665", "560", "490"]
     configs = []
-    configs.append({"x": rgb, "y": "oc", "machine": "ann"})
+    configs.append({"x": rgb, "y": "oc"})
 
     ev = Evaluator(
         cofigs=configs,

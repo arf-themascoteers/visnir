@@ -11,33 +11,30 @@ def train(device, ds:SpectralDataset, machine="ann"):
     batch_size = 600
     lr = 0.001
     x_size = ds.get_x().shape[1]
-    if machine == "ann":
-        model = ANN(size=x_size)
-    elif machine == "annx":
-        model = ANNX(size=x_size, intermediate=ds.get_intermediate().shape[1])
+    alpha = 0
+    intermediate_size = ds.get_intermediate().shape[1]
+    model = ANNX(size=x_size, intermediate=intermediate_size)
+    if intermediate_size != 0:
+        alpha = 0.1 / intermediate_size
     dataloader = DataLoader(ds, batch_size=batch_size, shuffle=True)
     model.train()
     model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=0.001)
     criterion = torch.nn.MSELoss(reduction='sum')
     n_batches = int(len(ds)/batch_size) + 1
-    alpha = 0.3
+
     for epoch in range(num_epochs):
         batch_number = 0
         for (x, intermediate, y) in dataloader:
             x = x.to(device)
             y = y.to(device)
-            if machine == "ann":
-                y_hat = model(x)
-                y_hat = y_hat.reshape(-1)
-                loss = criterion(y_hat, y)
-            else:#annx
+            y_hat, intermediate_hat = model(x)
+            y_hat = y_hat.reshape(-1)
+            loss = criterion(y_hat, y)
+            if intermediate.shape[1] !=0:
                 intermediate = intermediate.to(device)
-                y_hat, intermediate_hat = model(x)
-                y_hat = y_hat.reshape(-1)
-                loss_y = criterion(y_hat, y)
                 loss_intermediate = criterion(intermediate_hat, intermediate)
-                loss = loss_y + alpha * loss_intermediate
+                loss = loss + alpha * loss_intermediate
             loss.backward()
             optimizer.step()
             optimizer.zero_grad()
