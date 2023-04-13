@@ -17,7 +17,7 @@ if __name__ == "__main__":
         cofigs=configs,
         repeat=1,
         folds=10,
-        prefix="rgb_oc",
+        prefix="rgb_ocss",
         files = (train_file, test_file)
     )
     ev.process()
