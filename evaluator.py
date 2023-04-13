@@ -96,7 +96,10 @@ class Evaluator:
 
     @staticmethod
     def get_config_name(config):
-        name = "-".join(config["x"])+"_"+config["y"]
+        name = "-".join(config["x"])
+        if "intermediate" in config and config["intermediate"] is not None:
+            name = name.join(config["intermediate"])
+        name = name +"_"+config["y"]
         name = name.replace("665-560-490","RGB")
         return name
 
