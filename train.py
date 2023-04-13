@@ -4,7 +4,7 @@ from annx import ANNX
 from spectral_dataset import SpectralDataset
 
 
-def train(device, ds:SpectralDataset, machine="ann"):
+def train(device, ds:SpectralDataset):
     torch.manual_seed(1)
     num_epochs = 200
     batch_size = 600
