@@ -4,8 +4,8 @@ from evaluator import Evaluator
 
 
 if __name__ == "__main__":
-    train_file = "data/no_empty.csv"
-    test_file = "data/vis_with_empty.csv"
+    test_file = "data/no_empty.csv"
+    train_file = "data/vis_with_empty.csv"
     rgb = ["665", "560", "490"]
     configs = []
     configs.append({"x": rgb, "y": "oc", "machine": "ann"})

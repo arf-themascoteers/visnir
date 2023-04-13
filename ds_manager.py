@@ -8,11 +8,14 @@ from pandas.api.types import is_numeric_dtype
 
 
 class DSManager:
-    def __init__(self, name=None, folds=10, x=None, y="oc",min_row=0, intermediate=None, files=None):
+    def __init__(self, name=None, folds=10, x=None, y="oc",min_row=0, intermediate=None, files=None, ratios=None):
         self.files = files
         if x is None:
             x = ["665", "560", "490"]
         self.x = x
+        if ratios is None:
+            ratios = (1,1)
+        self.ratios = ratios
         if intermediate is None:
             intermediate = []
         self.intermediate = intermediate
@@ -39,7 +42,7 @@ class DSManager:
         self.full_data = df.to_numpy()
         self.full_data = self._normalize(self.full_data, ohe_offset)
         self.train = self.full_data[0:len(train_df)]
-        self.test = self.full_data[len(test_df):]
+        self.test = self.full_data[len(train_df):]
 
     def get_random_train_test_df(self):
         csv_file_location = f"data/vis_with_empty.csv"
@@ -47,7 +50,11 @@ class DSManager:
         return model_selection.train_test_split(df, test_size=0.2, random_state=2)
 
     def get_train_test_df_from_files(self, train_file, test_file):
-        return pd.read_csv(train_file), pd.read_csv(test_file)
+        train_df = pd.read_csv(train_file)
+        #train_df = train_df.sample(n=int(len(train_df)*self.ratios[0]))
+        test_df = pd.read_csv(test_file)
+        #test_df = test_df.sample(n=int(len(test_df) * self.ratios[0]))
+        return train_df, test_df
 
 
     def process_ohe(self, df):
@@ -66,16 +73,16 @@ class DSManager:
 
         return newdf, ohe_offset
 
-    def get_random_90_percent(self, array:np.ndarray):
-        indices = np.random.choice(array, size=int(array.size[0]*.9), replace=False)
+    def get_random_by_ratio(self, array:np.ndarray, ratio):
+        indices = np.random.choice(array.shape[0], int(array.shape[0]*ratio), replace=False)
         return array[indices]
 
 
     def get_k_folds(self):
-        if self.files is None:
+        if self.files is not None:
             for i in range(self.folds):
-                yield SpectralDataset(self.get_random_90_percent(self.train),self.x, self.intermediate), \
-                      SpectralDataset(self.get_random_90_percent(self.test),self.x, self.intermediate)
+                yield SpectralDataset(self.get_random_by_ratio(self.train,self.ratios[0]), self.x, self.intermediate), \
+                      SpectralDataset(self.get_random_by_ratio(self.test,self.ratios[1]), self.x, self.intermediate)
         else:
             kf = KFold(n_splits=self.folds)
             for i, (train_index, test_index) in enumerate(kf.split(self.full_data)):

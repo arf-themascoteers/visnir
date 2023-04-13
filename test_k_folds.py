@@ -20,8 +20,9 @@ import numpy as np
 
 x = np.array(list(range(100)))
 
-indices = np.random.choice(x, size=90, replace=False)
-y = x[indices]
+idx = np.random.choice(x.shape[0], 90, replace=False)
+y = x[idx]
 
 print(type(y))
 print(y)
+print(sorted(idx))
