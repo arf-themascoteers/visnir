@@ -1,6 +1,5 @@
 import torch
 from torch.utils.data import DataLoader
-from ann import ANN
 from annx import ANNX
 from spectral_dataset import SpectralDataset
 
