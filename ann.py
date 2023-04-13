@@ -6,9 +6,9 @@ class ANN(nn.Module):
     def __init__(self, size=3):
         super().__init__()
         self.soc_vec = nn.Sequential(
-            nn.Linear(size, 10),
+            nn.Linear(size, 7),
             nn.LeakyReLU(),
-            nn.Linear(10, 5)
+            nn.Linear(7, 4)
         )
         self.n = nn.Sequential(
             nn.Linear(size,5),
@@ -16,7 +16,7 @@ class ANN(nn.Module):
             nn.Linear(5,1)
         )
         self.soc = nn.Sequential(
-            nn.Linear(6,3),
+            nn.Linear(5,3),
             nn.LeakyReLU(),
             nn.Linear(3,1)
         )
