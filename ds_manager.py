@@ -47,16 +47,17 @@ class DSManager:
         self.test = self.full_data[len(train_df):]
 
     def get_random_train_test_df(self):
-        df = pd.read_csv(self.files)
+        df = self.read_from_csv(self.files)
         return model_selection.train_test_split(df, test_size=0.2, random_state=2)
 
     def get_train_test_df_from_files(self, train_file, test_file):
-        train_df = pd.read_csv(train_file)
-        #train_df = train_df.sample(n=int(len(train_df)*self.ratios[0]))
-        test_df = pd.read_csv(test_file)
-        #test_df = test_df.sample(n=int(len(test_df) * self.ratios[0]))
+        train_df = self.read_from_csv(train_file)
+        test_df = self.read_from_csv(test_file)
         return train_df, test_df
 
+    def read_from_csv(self, file):
+        df = pd.read_csv(file)
+        return df
 
     def process_ohe(self, df):
         ohe_offset = 0
