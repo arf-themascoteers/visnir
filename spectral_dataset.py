@@ -7,21 +7,21 @@ class SpectralDataset(Dataset):
         self.df = source
         if x is None:
             x = list(range(source.shape[1]-1))
-        self.x = source[:,x]
+        self.x = torch.tensor(source[:,x], dtype=torch.float32)
+
+        if torch.isnan(self.x).sum() != 0:
+            raise "NAN in X"
 
         if intermediate is None:
             intermediate = []
-        self.intermediate = source[:,intermediate]
-        self.y = source[:,-1]
+        self.intermediate = torch.tensor(source[:,intermediate], dtype=torch.float32)
+        self.y = torch.tensor(source[:,-1], dtype=torch.float32)
 
     def __len__(self):
         return len(self.df)
 
     def __getitem__(self, idx):
-        this_x = torch.tensor(self.x[idx], dtype=torch.float32)
-        this_intermediate = torch.tensor(self.intermediate[idx], dtype=torch.float32)
-        this_soc = torch.tensor(self.y[idx], dtype=torch.float32)
-        return this_x, this_intermediate, this_soc
+        return self.x[idx], self.intermediate[idx], self.y[idx]
 
     def get_y(self):
         return self.y

@@ -8,7 +8,8 @@ from pandas.api.types import is_numeric_dtype
 
 
 class DSManager:
-    def __init__(self, name=None, folds=10, x=None, y="oc",min_row=0, intermediate=None):
+    def __init__(self, name=None, folds=10, x=None, y="oc",min_row=0, intermediate=None, files=None):
+        self.files = files
         if x is None:
             x = ["665", "560", "490"]
         self.x = x
@@ -22,23 +23,32 @@ class DSManager:
 
         self.folds = folds
 
-        csv_file_location = f"data/vis_with_empty.csv"
-        df = pd.read_csv(csv_file_location)
+        train_df, test_df = None, None
 
+        if self.files is None:
+            train_df, test_df = self.get_random_train_test_df()
+        else:
+            train_df, test_df = self.get_train_test_df_from_files(self.files[0], self.files[1])
+
+        df = pd.concat([train_df, test_df])
         columns = x + intermediate + [y]
         df = df[columns]
-
         df, ohe_offset = self.process_ohe(df)
-
         self.x = self.get_updated_columns(df, self.x)
         self.intermediate = self.get_updated_columns(df, self.intermediate)
-        npdf = df.to_numpy()
-        npdf = self._normalize(npdf, ohe_offset)
-        train, test = model_selection.train_test_split(npdf, test_size=0.2, random_state=2)
-        self.full_data = np.concatenate((train, test), axis=0)
-        self.full_ds = SpectralDataset(self.full_data, self.x, self.intermediate)
-        self.train_ds = SpectralDataset(train, self.x, self.intermediate)
-        self.test_ds = SpectralDataset(test, self.x, self.intermediate)
+        self.full_data = df.to_numpy()
+        self.full_data = self._normalize(self.full_data, ohe_offset)
+        self.train = self.full_data[0:len(train_df)]
+        self.test = self.full_data[len(test_df):]
+
+    def get_random_train_test_df(self):
+        csv_file_location = f"data/vis_with_empty.csv"
+        df = pd.read_csv(csv_file_location)
+        return model_selection.train_test_split(df, test_size=0.2, random_state=2)
+
+    def get_train_test_df_from_files(self, train_file, test_file):
+        return pd.read_csv(train_file), pd.read_csv(test_file)
+
 
     def process_ohe(self, df):
         ohe_offset = 0
@@ -56,19 +66,23 @@ class DSManager:
 
         return newdf, ohe_offset
 
-    def get_test_ds(self):
-        return self.test_ds
+    def get_random_90_percent(self, array:np.ndarray):
+        indices = np.random.choice(array, size=int(array.size[0]*.9), replace=False)
+        return array[indices]
 
-    def get_train_ds(self):
-        return self.train_ds
 
     def get_k_folds(self):
-        kf = KFold(n_splits=self.folds)
-        for i, (train_index, test_index) in enumerate(kf.split(self.full_data)):
-            train_data = self.full_data[train_index]
-            test_data = self.full_data[test_index]
-            yield SpectralDataset(train_data, self.x, self.intermediate), \
-                SpectralDataset(test_data, self.x, self.intermediate)
+        if self.files is None:
+            for i in range(self.folds):
+                yield SpectralDataset(self.get_random_90_percent(self.train),self.x, self.intermediate), \
+                      SpectralDataset(self.get_random_90_percent(self.test),self.x, self.intermediate)
+        else:
+            kf = KFold(n_splits=self.folds)
+            for i, (train_index, test_index) in enumerate(kf.split(self.full_data)):
+                train_data = self.full_data[train_index]
+                test_data = self.full_data[test_index]
+                yield SpectralDataset(train_data, self.x, self.intermediate), \
+                    SpectralDataset(test_data, self.x, self.intermediate)
 
     def get_folds(self):
         return self.folds
