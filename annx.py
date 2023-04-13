@@ -6,9 +6,9 @@ class ANNX(nn.Module):
     def __init__(self, size=3,intermediate=0):
         super().__init__()
         self.soc_vec = nn.Sequential(
-            nn.Linear(size, 7),
+            nn.Linear(size, 10),
             nn.LeakyReLU(),
-            nn.Linear(7, 4)
+            nn.Linear(10, 5)
         )
         intermediate_nodes = intermediate
         if intermediate_nodes == 0:
@@ -19,7 +19,7 @@ class ANNX(nn.Module):
             nn.Linear(5,intermediate_nodes)
         )
         self.soc = nn.Sequential(
-            nn.Linear(4 + intermediate_nodes,3),
+            nn.Linear(5 + intermediate_nodes,3),
             nn.LeakyReLU(),
             nn.Linear(3,1)
         )
