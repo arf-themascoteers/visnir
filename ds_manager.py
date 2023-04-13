@@ -10,6 +10,8 @@ from pandas.api.types import is_numeric_dtype
 class DSManager:
     def __init__(self, name=None, folds=10, x=None, y="oc",min_row=0, intermediate=None, files=None, ratios=None):
         self.files = files
+        if self.files is None:
+            self.files = "data/vis_with_empty.csv"
         if x is None:
             x = ["665", "560", "490"]
         self.x = x
@@ -28,7 +30,7 @@ class DSManager:
 
         train_df, test_df = None, None
 
-        if self.files is None:
+        if isinstance(self.files, str):
             train_df, test_df = self.get_random_train_test_df()
         else:
             train_df, test_df = self.get_train_test_df_from_files(self.files[0], self.files[1])
@@ -45,8 +47,7 @@ class DSManager:
         self.test = self.full_data[len(train_df):]
 
     def get_random_train_test_df(self):
-        csv_file_location = f"data/vis_with_empty.csv"
-        df = pd.read_csv(csv_file_location)
+        df = pd.read_csv(self.files)
         return model_selection.train_test_split(df, test_size=0.2, random_state=2)
 
     def get_train_test_df_from_files(self, train_file, test_file):

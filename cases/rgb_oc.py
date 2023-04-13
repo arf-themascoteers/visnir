@@ -4,15 +4,16 @@ from evaluator import Evaluator
 
 
 if __name__ == "__main__":
+    rgb = ["665", "560", "490"]
     configs = []
-    for property in ["phc","phh","ec","caco3","p","n","k","elevation","lc1","lu1","stones","oc"]:
-        configs.append({"x":[property], "y":"oc", "machine":"ann"})
+    configs.append({"x": rgb, "y": "oc"})
+
 
     ev = Evaluator(
         cofigs=configs,
         repeat=1,
         folds=10,
-        prefix="single"
+        prefix="rgb_oc"
     )
     ev.process()
     print("Done all")
