@@ -6,7 +6,7 @@ from spectral_dataset import SpectralDataset
 
 def train(device, ds:SpectralDataset):
     torch.manual_seed(1)
-    num_epochs = 500
+    num_epochs = 600
     batch_size = 600
     lr = 0.001
     x_size = ds.get_x().shape[1]
@@ -14,7 +14,7 @@ def train(device, ds:SpectralDataset):
     intermediate_size = ds.get_intermediate().shape[1]
     model = ANNX(size=x_size, intermediate=intermediate_size)
     if intermediate_size != 0:
-        alpha = 0.3 / intermediate_size
+        alpha = 0.2 
     dataloader = DataLoader(ds, batch_size=batch_size, shuffle=True)
     model.train()
     model.to(device)

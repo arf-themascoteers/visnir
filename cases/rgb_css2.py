@@ -8,17 +8,17 @@ if __name__ == "__main__":
     test_file = "data/with_empty.csv"
     rgb = ["665", "560", "490"]
     configs = []
-    #configs.append({"x": rgb, "y": "oc"})
-    configs.append({"x": rgb, "y": "oc", "intermediate":["k"]})
-    # configs.append({"x": rgb, "y": "oc", "intermediate":["clay"]})
-    # configs.append({"x": rgb, "y": "oc", "intermediate":["clay", "sand", "silt"]})
+
+    configs.append({"x": rgb, "y": "oc", "intermediate":["clay","sand"]})
+    configs.append({"x": rgb, "y": "oc", "intermediate":["clay","sand","silt"]})
 
     ev = Evaluator(
         cofigs=configs,
         repeat=1,
         folds=10,
-        prefix="rgb_ocss2",
-        files = (train_file, test_file)
+        prefix="rgb_css2",
+        files = (train_file, test_file),
+        ratios = (1,0.1)
     )
     ev.process()
     print("Done all")

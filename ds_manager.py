@@ -57,6 +57,7 @@ class DSManager:
 
     def read_from_csv(self, file):
         df = pd.read_csv(file)
+        #df = df[df["distance"]<0.1]
         return df
 
     def process_ohe(self, df):
