@@ -41,6 +41,7 @@ class DSManager:
         df, ohe_offset = self.process_ohe(df)
         self.x = self.get_updated_columns(df, self.x)
         self.intermediate = self.get_updated_columns(df, self.intermediate)
+        self.css = self.get_updated_columns(df, ["clay", "sand", "silt"])
         self.full_data = df.to_numpy()
         self.full_data = self._normalize(self.full_data, ohe_offset)
         self.train = self.full_data[0:len(train_df)]
@@ -99,9 +100,12 @@ class DSManager:
 
     def _normalize(self, data, offset=0):
         for i in range(offset, data.shape[1]):
-            scaler = MinMaxScaler()
-            x_scaled = scaler.fit_transform(data[:,i].reshape(-1, 1))
-            data[:,i] = np.squeeze(x_scaled)
+            if i in self.css:
+                data[:,i] = data[:,i] / 100
+            else:
+                scaler = MinMaxScaler()
+                x_scaled = scaler.fit_transform(data[:,i].reshape(-1, 1))
+                data[:,i] = np.squeeze(x_scaled)
         return data
 
     def get_updated_columns(self, df, columns):
