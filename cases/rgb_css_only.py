@@ -16,7 +16,7 @@ if __name__ == "__main__":
         cofigs=configs,
         repeat=1,
         folds=10,
-        prefix="rgb_css_only",
+        prefix="rgb_css_only4",
         files = (train_file, test_file),
         ratios=(1,0.06)
     )
