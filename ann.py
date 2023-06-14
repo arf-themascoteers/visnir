@@ -1,0 +1,92 @@
+import torch
+import torch.nn as nn
+from spectral_dataset import SpectralDataset
+from torch.utils.data import DataLoader
+from sklearn.metrics import r2_score
+
+
+class ANN(nn.Module):
+    def __init__(self, device, ds:SpectralDataset, alpha = 0.1):
+        super().__init__()
+        torch.manual_seed(1)
+        self.device = device
+        self.ds = ds
+        self.alpha = 0
+        self.num_epochs = 600
+        self.batch_size = 600
+        self.lr = 0.001
+
+        x_size = ds.get_x().shape[1]
+        intermediate_size = ds.get_intermediate().shape[1]
+        size = x_size
+        intermediate = intermediate_size
+        self.soc_vec = nn.Sequential(
+            nn.Linear(size, 15),
+            nn.LeakyReLU(),
+            nn.Linear(15, 5)
+        )
+        intermediate_nodes = intermediate
+        if intermediate_nodes == 0:
+            intermediate_nodes = 1
+
+        self.n = nn.Sequential(
+            nn.Linear(size,5),
+            nn.LeakyReLU(),
+            nn.Linear(5,intermediate_nodes)
+        )
+        self.soc = nn.Sequential(
+            nn.Linear(5 + intermediate_nodes,3),
+            nn.LeakyReLU(),
+            nn.Linear(3,1)
+        )
+
+    def forward(self, x):
+        x1 = self.soc_vec(x)
+        x2 = self.n(x)
+        x = torch.hstack((x1,x2))
+        x = self.soc(x)
+        return x, x2
+
+    def train_model(self):
+        self.train()
+        self.to(self.device)
+        optimizer = torch.optim.Adam(self.parameters(), lr=self.lr, weight_decay=0.001)
+        criterion = torch.nn.MSELoss(reduction='sum')
+        n_batches = int(len(self.ds)/self.batch_size) + 1
+
+        dataloader = DataLoader(self.ds, batch_size=self.batch_size, shuffle=True)
+
+        for epoch in range(self.num_epochs):
+            batch_number = 0
+            for (x, intermediate, y) in dataloader:
+                x = x.to(self.device)
+                y = y.to(self.device)
+                y_hat, intermediate_hat = self(x)
+                y_hat = y_hat.reshape(-1)
+                loss = criterion(y_hat, y)
+                if intermediate.shape[1] !=0:
+                    intermediate = intermediate.to(self.device)
+                    loss_intermediate = criterion(intermediate_hat, intermediate)
+                    loss = (1-self.alpha) * loss + self.alpha * loss_intermediate
+                loss.backward()
+                optimizer.step()
+                optimizer.zero_grad()
+                batch_number += 1
+                #print(f'Epoch:{epoch + 1} (of {num_epochs}), Batch: {batch_number} of {n_batches}, Loss:{loss.item():.6f}')
+
+    def test(self, device):
+        batch_size = 30000
+        self.eval()
+        self.to(device)
+
+        dataloader = DataLoader(self.ds, batch_size=batch_size, shuffle=True)
+
+        for (x, intermediate, y) in dataloader:
+            x = x.to(device)
+            y = y.to(device)
+            y_hat, intermediate = self(x)
+            y_hat = y_hat.reshape(-1)
+            y = y.detach().cpu().numpy()
+            y_hat = y_hat.detach().cpu().numpy()
+            r2 = r2_score(y, y_hat)
+            return r2
