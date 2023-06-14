@@ -4,13 +4,12 @@ from annx import ANNX
 from spectral_dataset import SpectralDataset
 
 
-def train(device, ds:SpectralDataset):
+def train(device, ds:SpectralDataset, alpha=0):
     torch.manual_seed(1)
     num_epochs = 600
     batch_size = 600
     lr = 0.001
     x_size = ds.get_x().shape[1]
-    alpha = 0
     intermediate_size = ds.get_intermediate().shape[1]
     model = ANNX(size=x_size, intermediate=intermediate_size)
     if intermediate_size != 0:
@@ -33,7 +32,7 @@ def train(device, ds:SpectralDataset):
             if intermediate.shape[1] !=0:
                 intermediate = intermediate.to(device)
                 loss_intermediate = criterion(intermediate_hat, intermediate)
-                loss = loss + alpha * loss_intermediate
+                loss = (1-alpha) * loss + alpha * loss_intermediate
             loss.backward()
             optimizer.step()
             optimizer.zero_grad()

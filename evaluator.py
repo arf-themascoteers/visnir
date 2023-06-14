@@ -10,7 +10,8 @@ from test import test
 
 class Evaluator:
     def __init__(self, cofigs=None, prefix="", verbose=False,
-                 repeat=1, folds=10, files = None, ratios = None
+                 repeat=1, folds=10, files = None, ratios = None,
+                 alpha=0
                  ):
         if cofigs is None:
             cofigs = [{"x":["665", "560", "490"], "intermediate":[], "y":"oc"}]
@@ -18,6 +19,7 @@ class Evaluator:
         self.files = files
         self.configs = cofigs
         self.repeat = repeat
+        self.alpha = alpha
         self.folds = folds
         self.verbose = verbose
         self.summary_file = f"results/{prefix}_summary.csv"
@@ -146,7 +148,7 @@ class Evaluator:
             return self.TEST_SCORE
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model_instance = train(device, train_ds)
+        model_instance = train(device, train_ds, self.alpha)
         return test(device, test_ds, model_instance)
 
     def create_summary_index(self):
