@@ -1,5 +1,5 @@
 import os
-os.chdir("../")
+os.chdir("../../")
 from evaluator import Evaluator
 
 
@@ -8,13 +8,6 @@ if __name__ == "__main__":
     configs = []
 
     configs.append({"x": rgb, "y": "oc"})
-    configs.append({"x": rgb+["clay"], "y": "oc"})
-    configs.append({"x": rgb+["sand"], "y": "oc"})
-    configs.append({"x": rgb+["silt"], "y": "oc"})
-    configs.append({"x": rgb+["clay","sand"], "y": "oc"})
-    configs.append({"x": rgb+["sand","silt"], "y": "oc"})
-    configs.append({"x": rgb+["silt","clay"], "y": "oc"})
-    configs.append({"x": rgb+["clay","sand","silt"], "y": "oc"})
     configs.append({"x": rgb, "y": "oc", "intermediate":["clay"]})
     configs.append({"x": rgb, "y": "oc", "intermediate":["sand"]})
     configs.append({"x": rgb, "y": "oc", "intermediate":["silt"]})
@@ -27,7 +20,7 @@ if __name__ == "__main__":
         cofigs=configs,
         repeat=1,
         folds=10,
-        prefix="rgb_css_all",
+        prefix="rgb_css_all_small",
         files = "data/no_empty.csv"
     )
     ev.process()

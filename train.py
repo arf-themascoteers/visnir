@@ -14,7 +14,7 @@ def train(device, ds:SpectralDataset):
     intermediate_size = ds.get_intermediate().shape[1]
     model = ANNX(size=x_size, intermediate=intermediate_size)
     if intermediate_size != 0:
-        alpha = 0.3
+        alpha = 0.2
     dataloader = DataLoader(ds, batch_size=batch_size, shuffle=True)
     model.train()
     model.to(device)

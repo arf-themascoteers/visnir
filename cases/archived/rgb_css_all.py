@@ -1,12 +1,9 @@
 import os
-os.chdir("../")
+os.chdir("../../")
 from evaluator import Evaluator
 
 
 if __name__ == "__main__":
-    train_file = "data/no_empty.csv"
-    test_file = "data/with_empty.csv"
-
     rgb = ["665", "560", "490"]
     configs = []
 
@@ -30,8 +27,8 @@ if __name__ == "__main__":
         cofigs=configs,
         repeat=1,
         folds=10,
-        prefix="rgb_css_all_full",
-        files = (train_file, test_file)
+        prefix="rgb_css_all",
+        files = "data/no_empty.csv"
     )
     ev.process()
     print("Done all")
