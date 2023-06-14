@@ -8,8 +8,6 @@ if __name__ == "__main__":
     rgb = ["665", "560", "490"]
     configs = []
 
-    configs.append({"x": rgb, "y": "oc"})
-
     for property in ["phc","phh","ec","caco3","p","n","k","stones"]:
         configs.append({"x":rgb, "y":"oc",  "intermediate":[property]})
 
