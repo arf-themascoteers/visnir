@@ -4,9 +4,7 @@ import ds_manager
 import os
 from datetime import datetime
 import torch
-from train import train
-from test import test
-
+from ann import ANN
 
 class Evaluator:
     def __init__(self, cofigs=None, prefix="", verbose=False,
@@ -148,8 +146,9 @@ class Evaluator:
             return self.TEST_SCORE
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model_instance = train(device, train_ds, self.alpha)
-        return test(device, test_ds, model_instance)
+        model = ANN(device, train_ds, test_ds, self.alpha)
+        model.train_model()
+        return model.test()
 
     def create_summary_index(self):
         index = []

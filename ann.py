@@ -6,18 +6,19 @@ from sklearn.metrics import r2_score
 
 
 class ANN(nn.Module):
-    def __init__(self, device, ds:SpectralDataset, alpha = 0.1):
+    def __init__(self, device, train_ds, test_ds, alpha = 0.1):
         super().__init__()
         torch.manual_seed(1)
         self.device = device
-        self.ds = ds
+        self.train_ds = train_ds
+        self.test_ds = test_ds
         self.alpha = 0
         self.num_epochs = 600
         self.batch_size = 600
         self.lr = 0.001
 
-        x_size = ds.get_x().shape[1]
-        intermediate_size = ds.get_intermediate().shape[1]
+        x_size = train_ds.get_x().shape[1]
+        intermediate_size = train_ds.get_intermediate().shape[1]
         size = x_size
         intermediate = intermediate_size
         self.soc_vec = nn.Sequential(
@@ -52,9 +53,9 @@ class ANN(nn.Module):
         self.to(self.device)
         optimizer = torch.optim.Adam(self.parameters(), lr=self.lr, weight_decay=0.001)
         criterion = torch.nn.MSELoss(reduction='sum')
-        n_batches = int(len(self.ds)/self.batch_size) + 1
+        n_batches = int(len(self.train_ds)/self.batch_size) + 1
 
-        dataloader = DataLoader(self.ds, batch_size=self.batch_size, shuffle=True)
+        dataloader = DataLoader(self.train_ds, batch_size=self.batch_size, shuffle=True)
 
         for epoch in range(self.num_epochs):
             batch_number = 0
@@ -79,7 +80,7 @@ class ANN(nn.Module):
         self.eval()
         self.to(device)
 
-        dataloader = DataLoader(self.ds, batch_size=batch_size, shuffle=True)
+        dataloader = DataLoader(self.test_ds, batch_size=batch_size, shuffle=True)
 
         for (x, intermediate, y) in dataloader:
             x = x.to(device)
