@@ -75,16 +75,16 @@ class ANN(nn.Module):
                 batch_number += 1
                 #print(f'Epoch:{epoch + 1} (of {num_epochs}), Batch: {batch_number} of {n_batches}, Loss:{loss.item():.6f}')
 
-    def test(self, device):
+    def test(self):
         batch_size = 30000
         self.eval()
-        self.to(device)
+        self.to(self.device)
 
         dataloader = DataLoader(self.test_ds, batch_size=batch_size, shuffle=True)
 
         for (x, intermediate, y) in dataloader:
-            x = x.to(device)
-            y = y.to(device)
+            x = x.to(self.device)
+            y = y.to(self.device)
             y_hat, intermediate = self(x)
             y_hat = y_hat.reshape(-1)
             y = y.detach().cpu().numpy()
