@@ -4,7 +4,7 @@ from evaluator import Evaluator
 
 
 if __name__ == "__main__":
-    alpha = 0.7
+    alpha = 0.1
     rgb = ["665", "560", "490"]
     configs = []
 
@@ -16,7 +16,7 @@ if __name__ == "__main__":
             cofigs=configs,
             repeat=1,
             folds=10,
-            prefix=f"single_{alpha}",
+            prefix=f"single_{int(alpha*10)}",
             files="data/vis_with_empty.csv",
             alpha=alpha
         )
