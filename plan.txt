@@ -1,0 +1,17 @@
+done--- #1 epoch 300 to 600
+
+#2        self.batch_size = 3000 -> 600
+
+#3        self.lr = 0.01 - > 0.001
+
+#4 same arch for both cases (int node)
+
+#5
+
+                nn.Linear(4 + self.intermediate_size,3),
+                nn.LeakyReLU(),
+                nn.Linear(3,1)
+
+                >>
+
+                nn.Linear(4 + self.intermediate_size,1)

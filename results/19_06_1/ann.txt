@@ -13,7 +13,7 @@ class ANN(nn.Module):
         self.train_ds = train_ds
         self.test_ds = test_ds
         self.alpha = 0
-        self.num_epochs = 600
+        self.num_epochs = 300
         self.batch_size = 3000
         self.lr = 0.01
 
@@ -25,26 +25,22 @@ class ANN(nn.Module):
             self.linear = nn.Sequential(
                 nn.Linear(size, 7),
                 nn.LeakyReLU(),
-                nn.Linear(7, 4),
-                nn.LeakyReLU(),
-                nn.Linear(4, 3),
-                nn.LeakyReLU(),
-                nn.Linear(3, 1)
+                nn.Linear(7, 1)
             )
         else:
             self.soc_vec = nn.Sequential(
-                nn.Linear(size, 7),
+                nn.Linear(size, 10),
                 nn.LeakyReLU(),
-                nn.Linear(7, 4)
+                nn.Linear(10, 5)
             )
 
             self.inter_vec = nn.Sequential(
-                nn.Linear(size,3),
+                nn.Linear(size,5),
                 nn.LeakyReLU(),
-                nn.Linear(3,self.intermediate_size)
+                nn.Linear(5,self.intermediate_size)
             )
             self.soc = nn.Sequential(
-                nn.Linear(4 + self.intermediate_size,3),
+                nn.Linear(5 + self.intermediate_size,3),
                 nn.LeakyReLU(),
                 nn.Linear(3,1)
             )
