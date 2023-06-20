@@ -1,5 +1,9 @@
 done--- #1 epoch 300 to 600
 
+#1.5 -- prop -> soc
+
+1.75 -- 0.8,0.9
+
 #2        self.batch_size = 3000 -> 600
 
 #3        self.lr = 0.01 - > 0.001
