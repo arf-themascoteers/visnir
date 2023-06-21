@@ -1,3 +1,5 @@
+0. LReLU between concat and next layer
+
 1. if result unfavourable - downgrade SOC net
 
 2. if result unfavourable - mimic int-net for OC
