@@ -4,7 +4,11 @@ done--- #1 epoch 300 to 600
 
 1.75 -- 0.8,0.9
 
+1.88 (optional): rgb - prop
+
 #2        self.batch_size = 3000 -> 600
+
+2.5 epoch 600 to 1200
 
 #3        self.lr = 0.01 - > 0.001
 

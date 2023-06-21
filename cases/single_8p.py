@@ -21,8 +21,8 @@ if __name__ == "__main__":
     for property in ["phc","phh","ec","caco3","p","n","k","stones"]:
         configs.append({"x":rgb, "y":"oc",  "intermediate":[property]})
 
-    alpha = 0.7
-    while alpha <= 0.7:
+    alpha = 0.8
+    while alpha <= 1:
         ev = Evaluator(
             cofigs=configs,
             repeat=1,
