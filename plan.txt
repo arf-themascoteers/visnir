@@ -1,21 +1,15 @@
-done--- #1 epoch 300 to 600
+1. if result unfavourable - downgrade SOC net
 
-done - #1.5 -- prop -> soc
+2. if result unfavourable - mimic int-net for OC
 
-ongoing - 1.75 -- 0.8,0.9
+3. self.batch_size = 600 - > 300
 
-ongoing 1.88 (optional): rgb - prop
+4. epoch 600 to 1200
 
-#2        self.batch_size = 3000 -> 600
+5. self.lr = 0.01 - > 0.001
 
-2.5 epoch 600 to 1200
 
-#3        self.lr = 0.01 - > 0.001
-
-#4 same arch for both cases (int node)
-
-#5
-
+6.
                 nn.Linear(4 + self.intermediate_size,3),
                 nn.LeakyReLU(),
                 nn.Linear(3,1)
