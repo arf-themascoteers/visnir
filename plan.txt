@@ -1,10 +1,10 @@
 done--- #1 epoch 300 to 600
 
-#1.5 -- prop -> soc
+done - #1.5 -- prop -> soc
 
-1.75 -- 0.8,0.9
+ongoing - 1.75 -- 0.8,0.9
 
-1.88 (optional): rgb - prop
+ongoing 1.88 (optional): rgb - prop
 
 #2        self.batch_size = 3000 -> 600
 
