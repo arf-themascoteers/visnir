@@ -6,13 +6,13 @@ from sklearn.metrics import r2_score
 
 
 class ANN(nn.Module):
-    def __init__(self, device, train_ds, test_ds, alpha = 0.1):
+    def __init__(self, device, train_ds, test_ds, alpha = 0.0):
         super().__init__()
         torch.manual_seed(1)
         self.device = device
         self.train_ds = train_ds
         self.test_ds = test_ds
-        self.alpha = 0
+        self.alpha = alpha
         self.num_epochs = 600
         self.batch_size = 600
         self.lr = 0.01
