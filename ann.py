@@ -3,6 +3,7 @@ import torch.nn as nn
 from spectral_dataset import SpectralDataset
 from torch.utils.data import DataLoader
 from sklearn.metrics import r2_score
+import torch.nn.functional as F
 
 
 class ANN(nn.Module):
@@ -23,30 +24,30 @@ class ANN(nn.Module):
 
         if self.intermediate_size == 0:
             self.linear = nn.Sequential(
-                nn.Linear(size, 7),
+                nn.Linear(size, 10),
                 nn.LeakyReLU(),
-                nn.Linear(7, 4),
+                nn.Linear(10, 5),
                 nn.LeakyReLU(),
-                nn.Linear(4, 3),
+                nn.Linear(5, 3),
                 nn.LeakyReLU(),
                 nn.Linear(3, 1)
             )
         else:
             self.soc_vec = nn.Sequential(
-                nn.Linear(size, 7),
+                nn.Linear(size, 10),
                 nn.LeakyReLU(),
-                nn.Linear(7, 4)
+                nn.Linear(10, 4)
             )
 
             self.inter_vec = nn.Sequential(
-                nn.Linear(size,3),
+                nn.Linear(size,10),
                 nn.LeakyReLU(),
-                nn.Linear(3,self.intermediate_size)
+                nn.Linear(10,self.intermediate_size)
             )
             self.soc = nn.Sequential(
-                nn.Linear(4 + self.intermediate_size,3),
+                nn.Linear(4 + self.intermediate_size,4),
                 nn.LeakyReLU(),
-                nn.Linear(3,1)
+                nn.Linear(4,1)
             )
 
     def forward(self, x):
@@ -56,6 +57,7 @@ class ANN(nn.Module):
         x1 = self.soc_vec(x)
         x2 = self.inter_vec(x)
         x = torch.hstack((x1,x2))
+        x = F.leaky_relu(x)
         x = self.soc(x)
         return x, x2
 
