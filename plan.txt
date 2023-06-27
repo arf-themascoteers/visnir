@@ -1,3 +1,10 @@
+nn.Linear(size,2),
+
+>
+
+nn.Linear(size,3),
+
+==============
 0. LReLU between concat and next layer
 
 1. if result unfavourable - downgrade SOC net

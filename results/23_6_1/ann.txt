@@ -24,30 +24,30 @@ class ANN(nn.Module):
 
         if self.intermediate_size == 0:
             self.linear = nn.Sequential(
-                nn.Linear(size, 10),
+                nn.Linear(size, 7),
                 nn.LeakyReLU(),
-                nn.Linear(10, 5),
+                nn.Linear(7, 4),
                 nn.LeakyReLU(),
-                nn.Linear(5, 3),
+                nn.Linear(4, 3),
                 nn.LeakyReLU(),
                 nn.Linear(3, 1)
             )
         else:
             self.soc_vec = nn.Sequential(
-                nn.Linear(size, 10),
+                nn.Linear(size, 7),
                 nn.LeakyReLU(),
-                nn.Linear(10, 4)
+                nn.Linear(7, 4)
             )
 
             self.inter_vec = nn.Sequential(
-                nn.Linear(size,2),
+                nn.Linear(size,3),
                 nn.LeakyReLU(),
-                nn.Linear(2,self.intermediate_size)
+                nn.Linear(3,self.intermediate_size)
             )
             self.soc = nn.Sequential(
-                nn.Linear(4 + self.intermediate_size,4),
+                nn.Linear(4 + self.intermediate_size,3),
                 nn.LeakyReLU(),
-                nn.Linear(4,1)
+                nn.Linear(3,1)
             )
 
     def forward(self, x):
