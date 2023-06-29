@@ -5,9 +5,7 @@ from torch.utils.data import Dataset
 class SpectralDataset(Dataset):
     def __init__(self, source, x):
         self.df = source
-        if x is None:
-            x = list(range(source.shape[1]-1))
-        self.x = torch.tensor(source[:,x], dtype=torch.float32)
+        self.x = torch.tensor(source[:,0:-1], dtype=torch.float32)
         self.y = torch.tensor(source[:,-1], dtype=torch.float32)
 
     def __len__(self):
