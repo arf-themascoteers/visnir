@@ -12,7 +12,7 @@ class Evaluator:
                  alpha=0
                  ):
         if cofigs is None:
-            cofigs = [{"x":["665", "560", "490"], "intermediate":[], "y":"oc"}]
+            cofigs = ["rgb","rgbn","rgbnp"]
         self.ratios = ratios
         self.files = files
         self.configs = cofigs
@@ -41,7 +41,7 @@ class Evaluator:
     def get_details_columns(self):
         details_columns = []
         for config in self.configs:
-            details_columns.append(f"{self.get_config_name(config)}")
+            details_columns.append(config)
         return details_columns
 
     def get_summary_columns(self):
@@ -89,19 +89,10 @@ class Evaluator:
 
     def log_scores(self, repeat_number, fold_number, config, score):
         log_file = open(self.log_file, "a")
-        log_file.write(f"\n{repeat_number} - {fold_number} - {self.get_config_name(config)}\n")
+        log_file.write(f"\n{repeat_number} - {fold_number} - {config}\n")
         log_file.write(str(score))
         log_file.write("\n")
         log_file.close()
-
-    @staticmethod
-    def get_config_name(config):
-        name = "-".join(config["x"])
-        if "intermediate" in config and config["intermediate"] is not None:
-            name = name + "_"+ ("-".join(config["intermediate"]))
-        name = name +"_"+config["y"]
-        name = name.replace("665-560-490","RGB")
-        return name
 
     def process(self):
         for repeat_number in range(self.repeat):
@@ -118,43 +109,37 @@ class Evaluator:
 
     def process_config(self, repeat_number, index_config):
         config = self.configs[index_config]
-        print("Start", f"{repeat_number}:{self.get_config_name(config)}")
+        print("Start", f"{repeat_number}:{config}")
         min_row = 0
-        if "min_row" in config:
-            min_row = config["min_row"]
-        intermediate = []
-        if "intermediate" in config:
-            intermediate = config["intermediate"]
-        ds = ds_manager.DSManager(folds=self.folds, x=config["x"], y=config["y"],
-                                  min_row=min_row, intermediate=intermediate, files=self.files, ratios=self.ratios)
+
+        ds = ds_manager.DSManager(folds=self.folds, config=config)
 
         for fold_number, (train_ds, test_ds) in enumerate(ds.get_k_folds()):
             score = self.get_details(index_config, repeat_number, fold_number)
             if score != 0:
                 print(f"{repeat_number}-{fold_number} done already")
             else:
-                score = self.calculate_score(train_ds, test_ds)
+                score = self.calculate_score(train_ds, test_ds, config)
                 self.log_scores(repeat_number, fold_number, config, score)
             if self.verbose:
                 print(score)
             self.set_details(index_config, repeat_number, fold_number, score)
             self.write_details()
 
-    def calculate_score(self, train_ds, test_ds):
+    def calculate_score(self, train_ds, test_ds, config):
         if self.TEST:
             self.TEST_SCORE = self.TEST_SCORE + 1
             return self.TEST_SCORE
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model = ANN(device, train_ds, test_ds, self.alpha)
+        model = ANN(device, train_ds, test_ds, config, self.alpha)
         model.train_model()
         return model.test()
 
     def create_summary_index(self):
         index = []
         for config in self.configs:
-            name = self.get_config_name(config)
-            index.append(f"{name}")
+            index.append(config)
         return index
 
 

@@ -8,113 +8,52 @@ from pandas.api.types import is_numeric_dtype
 
 
 class DSManager:
-    def __init__(self, name=None, folds=10, x=None, y="oc",min_row=0, intermediate=None, files=None, ratios=None):
-        self.files = files
-        if self.files is None:
-            self.files = "data/vis_with_empty.csv"
-        if x is None:
-            x = ["665", "560", "490"]
-        self.x = x
-        if ratios is None:
-            ratios = (1,1)
-        self.ratios = ratios
-        if intermediate is None:
-            intermediate = []
-        self.intermediate = intermediate
-        self.y = y
+    def __init__(self, name=None, folds=10, config="rgb"):
+        self.file = "data/vis_with_empty.csv"
+        train_df, test_df = self.get_random_train_test_df()
+        self.x = ["665", "560", "490"]
+        self.y = "oc"
         self.name = name
-
-        self.min_row = min_row
-
         self.folds = folds
-
-        train_df, test_df = None, None
-
-        if isinstance(self.files, str):
-            train_df, test_df = self.get_random_train_test_df()
-        else:
-            train_df, test_df = self.get_train_test_df_from_files(self.files[0], self.files[1])
-
         df = pd.concat([train_df, test_df])
-        columns = x + intermediate + [y]
+
+        if config != "rgb":
+            self.x = self.x + ["n"]
+
+        columns = self.x + [self.y]
         df = df[columns]
-        df, ohe_offset = self.process_ohe(df)
-        self.x = self.get_updated_columns(df, self.x)
-        self.intermediate = self.get_updated_columns(df, self.intermediate)
-        self.css = self.get_updated_columns(df, ["clay", "sand", "silt"])
         self.full_data = df.to_numpy()
-        self.full_data = self._normalize(self.full_data, ohe_offset)
+        self.full_data = self._normalize(self.full_data)
         self.train = self.full_data[0:len(train_df)]
         self.test = self.full_data[len(train_df):]
 
     def get_random_train_test_df(self):
-        df = self.read_from_csv(self.files)
+        df = self.read_from_csv(self.file)
         return model_selection.train_test_split(df, test_size=0.2, random_state=2)
-
-    def get_train_test_df_from_files(self, train_file, test_file):
-        train_df = self.read_from_csv(train_file)
-        test_df = self.read_from_csv(test_file)
-        return train_df, test_df
 
     def read_from_csv(self, file):
         df = pd.read_csv(file)
-        #df = df[df["distance"]<0.1]
         return df
 
-    def process_ohe(self, df):
-        ohe_offset = 0
-        newdf = df.copy()
-        for col in df.columns:
-            if not is_numeric_dtype(df[col]):
-                uniques = df[col].unique()
-                for a_value in uniques:
-                    if len(newdf[newdf[col] == a_value]) < self.min_row:
-                        newdf = newdf.drop(newdf[newdf[col] == a_value].index)
-                y = pd.get_dummies(newdf[col], prefix=col)
-                ohe_offset = ohe_offset + len(y.columns)
-                newdf = newdf.drop(col, axis=1)
-                newdf = pd.concat([y,newdf], axis=1)
-
-        return newdf, ohe_offset
-
-    def get_random_by_ratio(self, array:np.ndarray, ratio):
-        indices = np.random.choice(array.shape[0], int(array.shape[0]*ratio), replace=False)
-        return array[indices]
-
-
     def get_k_folds(self):
-        if self.files is not None:
+        if self.file is not None:
             for i in range(self.folds):
-                yield SpectralDataset(self.get_random_by_ratio(self.train,self.ratios[0]), self.x, self.intermediate), \
-                      SpectralDataset(self.get_random_by_ratio(self.test,self.ratios[1]), self.x, self.intermediate)
+                yield SpectralDataset(self.train, self.x), \
+                      SpectralDataset(self.test, self.x)
         else:
             kf = KFold(n_splits=self.folds)
             for i, (train_index, test_index) in enumerate(kf.split(self.full_data)):
                 train_data = self.full_data[train_index]
                 test_data = self.full_data[test_index]
-                yield SpectralDataset(train_data, self.x, self.intermediate), \
-                    SpectralDataset(test_data, self.x, self.intermediate)
+                yield SpectralDataset(train_data, self.x), \
+                    SpectralDataset(test_data, self.x)
 
     def get_folds(self):
         return self.folds
 
-    def _normalize(self, data, offset=0):
-        for i in range(offset, data.shape[1]):
-            if i in self.css:
-                data[:,i] = data[:,i] / 100
-            else:
-                scaler = MinMaxScaler()
-                x_scaled = scaler.fit_transform(data[:,i].reshape(-1, 1))
-                data[:,i] = np.squeeze(x_scaled)
+    def _normalize(self, data):
+        for i in range(data.shape[1]):
+            scaler = MinMaxScaler()
+            x_scaled = scaler.fit_transform(data[:,i].reshape(-1, 1))
+            data[:,i] = np.squeeze(x_scaled)
         return data
-
-    def get_updated_columns(self, df, columns):
-        indices = []
-        for index,col in enumerate(df.columns):
-            if col in columns:
-                indices.append(index)
-            else:
-                for i in columns:
-                    if col.startswith(f"{i}_"):
-                        indices.append(index)
-        return indices
