@@ -5,22 +5,18 @@ from evaluator import Evaluator
 
 if __name__ == "__main__":
     rgb = ["665", "560", "490"]
-    configs = []
+    configs = [{"x":rgb, "y":"oc",  "intermediate":["n"]}]
 
-    for property in ["phc","phh","ec","caco3","p","n","k","stones"]:
-        configs.append({"x":rgb, "y":"oc",  "intermediate":[property]})
-
-    alpha = 0
-    while alpha <= 0.9:
+    for alpha in range(10):
+        alpha_val = alpha/10
         ev = Evaluator(
             cofigs=configs,
             repeat=1,
             folds=10,
-            prefix=f"single_{alpha}",
+            prefix=f"single_{alpha_val}",
             files="data/vis_with_empty.csv",
-            alpha=alpha
+            alpha=alpha_val
         )
         ev.process()
-        alpha = alpha + 0.1
 
     print("Done all")
