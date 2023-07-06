@@ -20,7 +20,6 @@ class Evaluator:
         self.summary_file = f"results/{prefix}_summary.csv"
         self.details_file = f"results/{prefix}_details.csv"
         self.log_file = f"results/{prefix}_log.txt"
-        self.mean_file = f"results/{prefix}_mean.csv"
 
         self.summary_index = self.create_summary_index()
 
@@ -103,7 +102,7 @@ class Evaluator:
         self.process_config(repeat_number, 0)
 
     def process_config(self, repeat_number, index_config):
-        print("Start", f"{repeat_number}:{ANN}")
+        print("Start", f"{repeat_number}:ANN")
 
         ds = ds_manager.DSManager(folds=self.folds)
 
