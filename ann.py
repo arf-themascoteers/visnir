@@ -78,6 +78,10 @@ class ANN(nn.Module):
             y_hat = self(x)
             n_hat = y_hat[:, 0].reshape(-1)
             oc_hat = y_hat[:, 1].reshape(-1)
+            n = n.detach().cpu().numpy()
+            oc = oc.detach().cpu().numpy()
+            n_hat = n_hat.detach().cpu().numpy()
+            oc_hat = oc_hat.detach().cpu().numpy()
             r2_n = r2_score(n, n_hat)
             r2_oc = r2_score(oc, oc_hat)
             return r2_n, r2_oc
