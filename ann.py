@@ -55,9 +55,10 @@ class ANN(nn.Module):
                 y_hat = y_hat.reshape(-1)
                 loss = criterion(y_hat, y)
                 if self.loss_function == "rgbnp":
-                    nitrogen = x[:,-1].reshape(-1)
-                    loss_phy = torch.mean(F.relu( (nitrogen*3) - y_hat))
-                    loss = loss + (self.alpha * loss_phy)
+                    if epoch > 500:
+                        nitrogen = x[:,-1].reshape(-1)
+                        loss_phy = torch.mean(F.relu( nitrogen - y_hat))
+                        loss = loss + (self.alpha * loss_phy)
                 loss.backward()
                 optimizer.step()
                 optimizer.zero_grad()

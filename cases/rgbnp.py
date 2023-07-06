@@ -5,7 +5,7 @@ from evaluator import Evaluator
 
 if __name__ == "__main__":
     rgb = ["665", "560", "490"]
-    configs = ["rgbnp","rgbn","rgb"]
+    configs = ["rgbnp"]
 
     for alpha in range(10):
         alpha_val = alpha/10
@@ -13,9 +13,9 @@ if __name__ == "__main__":
             cofigs=configs,
             repeat=1,
             folds=10,
-            prefix=f"single_{alpha_val}",
+            prefix=f"rgbnp_{alpha_val}",
             alpha=alpha_val
         )
         ev.process()
 
-    print("Done all")
+    print("Done rgbnp")
