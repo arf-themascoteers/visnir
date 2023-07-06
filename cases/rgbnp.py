@@ -7,7 +7,7 @@ if __name__ == "__main__":
     rgb = ["665", "560", "490"]
     configs = ["rgbnp"]
 
-    for alpha in range(10):
+    for alpha in range(11):
         alpha_val = alpha/10
         ev = Evaluator(
             cofigs=configs,
