@@ -57,7 +57,7 @@ class ANN(nn.Module):
                 if self.loss_function == "rgbnp":
                     if epoch > 500:
                         nitrogen = x[:,-1].reshape(-1)
-                        loss_phy = torch.mean(F.relu( nitrogen - y_hat))
+                        loss_phy = torch.sum(F.relu( nitrogen - y_hat))
                         loss = (1-self.alpha) * loss + (self.alpha * loss_phy)
                 loss.backward()
                 optimizer.step()
