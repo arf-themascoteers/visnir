@@ -46,22 +46,22 @@ class ANN(nn.Module):
                 x = x.to(self.device)
                 y = y.to(self.device)
                 n = y[:,0]
-                oc = y[:,0]
+                oc = y[:,1]
                 y_hat = self(x)
                 n_hat = y_hat[:,0].reshape(-1)
                 oc_hat = y_hat[:,1].reshape(-1)
                 loss_n = criterion(n_hat, n)
                 loss_oc = criterion(oc_hat, oc)
-                loss_phy_1 = torch.mean(F.relu( n - oc_hat))
-                loss_phy_2 = torch.mean(F.relu( n_hat - oc))
+                loss_phy_1 = torch.sum(F.relu( n - oc_hat))
+                loss_phy_2 = torch.sum(F.relu( n_hat - oc))
                 loss = loss_n + loss_oc + (self.alpha * loss_phy_1) + (self.alpha * loss_phy_2)
                 loss.backward()
                 optimizer.step()
                 optimizer.zero_grad()
                 batch_number += 1
-                print(f'Epoch:{epoch + 1} (of {self.num_epochs}), Batch: {batch_number} of {n_batches}, Loss:{loss.item():.6f}')
-                print(f'L_P1:{self.alpha*loss_phy_1:0.3f}\tL_P2:{self.alpha*loss_phy_2:0.3f}'
-                      f'\tL_N:{loss_n:0.3f}\tL_OC:{loss_oc:0.3f}')
+                # print(f'Epoch:{epoch + 1} (of {self.num_epochs}), Batch: {batch_number} of {n_batches}, Loss:{loss.item():.6f}')
+                # print(f'L_P1:{self.alpha*loss_phy_1:0.3f}\tL_P2:{self.alpha*loss_phy_2:0.3f}'
+                #       f'\tL_N:{loss_n:0.3f}\tL_OC:{loss_oc:0.3f}')
 
     def test(self):
         batch_size = 30000
@@ -73,9 +73,11 @@ class ANN(nn.Module):
         for (x, y) in dataloader:
             x = x.to(self.device)
             y = y.to(self.device)
+            n = y[:, 0]
+            oc = y[:, 1]
             y_hat = self(x)
-            y_hat = y_hat.reshape(-1)
-            y = y.detach().cpu().numpy()
-            y_hat = y_hat.detach().cpu().numpy()
-            r2 = r2_score(y, y_hat)
-            return r2
+            n_hat = y_hat[:, 0].reshape(-1)
+            oc_hat = y_hat[:, 1].reshape(-1)
+            r2_n = r2_score(n, n_hat)
+            r2_oc = r2_score(oc, oc_hat)
+            return r2_n, r2_oc
