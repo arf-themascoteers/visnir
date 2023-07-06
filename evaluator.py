@@ -138,7 +138,7 @@ class Evaluator:
     def calculate_score(self, train_ds, test_ds):
         if self.TEST:
             self.TEST_SCORE = self.TEST_SCORE + 1
-            return self.TEST_SCORE
+            return self.TEST_SCORE, self.TEST_SCORE
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model = ANN(device, train_ds, test_ds, "ANN", self.alpha)
