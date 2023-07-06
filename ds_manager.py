@@ -8,19 +8,15 @@ from pandas.api.types import is_numeric_dtype
 
 
 class DSManager:
-    def __init__(self, name=None, folds=10, config="rgb"):
+    def __init__(self, name=None, folds=10):
         self.file = "data/vis_with_empty.csv"
         train_df, test_df = self.get_random_train_test_df()
         self.x = ["665", "560", "490"]
-        self.y = "oc"
+        self.y = ["n","oc"]
         self.name = name
         self.folds = folds
         df = pd.concat([train_df, test_df])
-
-        if config != "rgb":
-            self.x = self.x + ["n"]
-
-        columns = self.x + [self.y]
+        columns = self.x + self.y
         df = df[columns]
         self.full_data = df.to_numpy()
         self.full_data = self._normalize(self.full_data)
@@ -36,17 +32,8 @@ class DSManager:
         return df
 
     def get_k_folds(self):
-        if self.file is not None:
-            for i in range(self.folds):
-                yield SpectralDataset(self.train, self.x), \
-                      SpectralDataset(self.test, self.x)
-        else:
-            kf = KFold(n_splits=self.folds)
-            for i, (train_index, test_index) in enumerate(kf.split(self.full_data)):
-                train_data = self.full_data[train_index]
-                test_data = self.full_data[test_index]
-                yield SpectralDataset(train_data, self.x), \
-                    SpectralDataset(test_data, self.x)
+        for i in range(self.folds):
+            yield SpectralDataset(self.train), SpectralDataset(self.test)
 
     def get_folds(self):
         return self.folds

@@ -17,20 +17,14 @@ class ANN(nn.Module):
         self.num_epochs = 600
         self.batch_size = 600
         self.lr = 0.01
-        self.loss_function = "normal"
-        if config == "rgbnp":
-            self.loss_function = "rgbnp"
-
-        size = train_ds.get_x().shape[1]
-
         self.linear = nn.Sequential(
-            nn.Linear(size, 10),
+            nn.Linear(3, 10),
             nn.LeakyReLU(),
             nn.Linear(10, 5),
             nn.LeakyReLU(),
             nn.Linear(5, 3),
             nn.LeakyReLU(),
-            nn.Linear(3, 1)
+            nn.Linear(3, 2)
         )
 
     def forward(self, x):
@@ -51,13 +45,16 @@ class ANN(nn.Module):
             for (x, y) in dataloader:
                 x = x.to(self.device)
                 y = y.to(self.device)
+                n = y[:,0]
+                oc = y[:,0]
                 y_hat = self(x)
-                y_hat = y_hat.reshape(-1)
-                loss = criterion(y_hat, y)
-                if self.loss_function == "rgbnp":
-                    nitrogen = x[:,-1].reshape(-1)
-                    loss_phy = torch.mean(F.relu( (nitrogen*3) - y_hat))
-                    loss = loss + (self.alpha * loss_phy)
+                n_hat = y_hat[:,0].reshape(-1)
+                oc_hat = y_hat[:,1].reshape(-1)
+                loss_n = criterion(n_hat, n)
+                loss_oc = criterion(oc_hat, oc)
+                loss_phy_1 = torch.mean(F.relu( n - oc_hat))
+                loss_phy_2 = torch.mean(F.relu( n_hat - oc))
+                loss = loss_n + loss_oc + (self.alpha * loss_phy_1) + (self.alpha * loss_phy_2)
                 loss.backward()
                 optimizer.step()
                 optimizer.zero_grad()

@@ -7,15 +7,12 @@ import torch
 from ann import ANN
 
 class Evaluator:
-    def __init__(self, cofigs=None, prefix="", verbose=False,
+    def __init__(self, prefix="", verbose=False,
                  repeat=1, folds=10, files = None, ratios = None,
                  alpha=0
                  ):
-        if cofigs is None:
-            cofigs = ["rgb","rgbn","rgbnp"]
         self.ratios = ratios
         self.files = files
-        self.configs = cofigs
         self.repeat = repeat
         self.alpha = alpha
         self.folds = folds
@@ -27,7 +24,7 @@ class Evaluator:
 
         self.summary_index = self.create_summary_index()
 
-        self.details = np.zeros((self.folds*self.repeat, len(self.configs)))
+        self.details = np.zeros((self.folds*self.repeat, 1))
         self.details_index = self.get_details_index()
         self.details_columns = self.get_details_columns()
         self.summary_columns = self.get_summary_columns()
@@ -40,8 +37,7 @@ class Evaluator:
 
     def get_details_columns(self):
         details_columns = []
-        for config in self.configs:
-            details_columns.append(config)
+        details_columns.append("ANN")
         return details_columns
 
     def get_summary_columns(self):
@@ -87,9 +83,9 @@ class Evaluator:
         df = pd.DataFrame(data=self.details, columns=self.details_columns, index=self.details_index)
         df.to_csv(self.details_file)
 
-    def log_scores(self, repeat_number, fold_number, config, score):
+    def log_scores(self, repeat_number, fold_number, score):
         log_file = open(self.log_file, "a")
-        log_file.write(f"\n{repeat_number} - {fold_number} - {config}\n")
+        log_file.write(f"\n{repeat_number} - {fold_number} - ANN\n")
         log_file.write(str(score))
         log_file.write("\n")
         log_file.close()
@@ -104,59 +100,36 @@ class Evaluator:
         self.write_summary(score_mean)
 
     def process_repeat(self, repeat_number):
-        for index_config, config in enumerate(self.configs):
-            self.process_config(repeat_number, index_config)
+        self.process_config(repeat_number, 0)
 
     def process_config(self, repeat_number, index_config):
-        config = self.configs[index_config]
-        print("Start", f"{repeat_number}:{config}")
-        min_row = 0
+        print("Start", f"{repeat_number}:{ANN}")
 
-        ds = ds_manager.DSManager(folds=self.folds, config=config)
+        ds = ds_manager.DSManager(folds=self.folds)
 
         for fold_number, (train_ds, test_ds) in enumerate(ds.get_k_folds()):
             score = self.get_details(index_config, repeat_number, fold_number)
             if score != 0:
                 print(f"{repeat_number}-{fold_number} done already")
             else:
-                score = self.calculate_score(train_ds, test_ds, config)
-                self.log_scores(repeat_number, fold_number, config, score)
+                score = self.calculate_score(train_ds, test_ds)
+                self.log_scores(repeat_number, fold_number, score)
             if self.verbose:
                 print(score)
             self.set_details(index_config, repeat_number, fold_number, score)
             self.write_details()
 
-    def calculate_score(self, train_ds, test_ds, config):
+    def calculate_score(self, train_ds, test_ds):
         if self.TEST:
             self.TEST_SCORE = self.TEST_SCORE + 1
             return self.TEST_SCORE
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model = ANN(device, train_ds, test_ds, config, self.alpha)
+        model = ANN(device, train_ds, test_ds, "ANN", self.alpha)
         model.train_model()
         return model.test()
 
     def create_summary_index(self):
         index = []
-        for config in self.configs:
-            index.append(config)
+        index.append("ANN")
         return index
-
-
-
-
-
-if __name__ == "__main__":
-    ev = Evaluator(
-        cofigs=[
-            {"x":["665", "560", "490"], "y":"oc"},
-            # {"x":["665", "560", "490","n"], "y":"oc"},
-            # {"x":["665", "560", "490"], "y":"n"},
-            # {"x":["665", "560", "490","oc"], "y":"n"},
-            # {"x":["n"], "y":"oc"},
-            {"x":["oc"], "y":"n"}
-        ],
-        repeat=3
-    )
-    ev.process()
-    print("Done all")

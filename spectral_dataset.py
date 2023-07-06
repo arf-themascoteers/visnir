@@ -3,10 +3,10 @@ from torch.utils.data import Dataset
 
 
 class SpectralDataset(Dataset):
-    def __init__(self, source, x):
+    def __init__(self, source):
         self.df = source
-        self.x = torch.tensor(source[:,0:-1], dtype=torch.float32)
-        self.y = torch.tensor(source[:,-1], dtype=torch.float32)
+        self.x = torch.tensor(source[:,0:-2], dtype=torch.float32)
+        self.y = torch.tensor(source[:,-2:], dtype=torch.float32)
 
     def __len__(self):
         return len(self.df)
