@@ -36,17 +36,11 @@ class DSManager:
         return df
 
     def get_k_folds(self):
-        if self.file is not None:
-            for i in range(self.folds):
-                yield SpectralDataset(self.train, self.x), \
-                      SpectralDataset(self.test, self.x)
-        else:
-            kf = KFold(n_splits=self.folds)
-            for i, (train_index, test_index) in enumerate(kf.split(self.full_data)):
-                train_data = self.full_data[train_index]
-                test_data = self.full_data[test_index]
-                yield SpectralDataset(train_data, self.x), \
-                    SpectralDataset(test_data, self.x)
+        kf = KFold(n_splits=self.folds)
+        for i, (train_index, test_index) in enumerate(kf.split(self.full_data)):
+            train_data = self.full_data[train_index]
+            test_data = self.full_data[test_index]
+            yield SpectralDataset(train_data), SpectralDataset(test_data)
 
     def get_folds(self):
         return self.folds
