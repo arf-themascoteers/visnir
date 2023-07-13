@@ -1,5 +1,4 @@
 import os
-os.chdir("../")
 from evaluator import Evaluator
 
 
@@ -21,4 +20,5 @@ def process():
 
 
 if __name__ == "__main__":
+    os.chdir("../")
     process()
