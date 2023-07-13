@@ -98,9 +98,16 @@ class ANN(nn.Module):
         for (x, intermediate, y) in dataloader:
             x = x.to(self.device)
             y = y.to(self.device)
-            y_hat, intermediate = self(x)
+            y_hat, intermediate_hat = self(x)
+
             y_hat = y_hat.reshape(-1)
             y = y.detach().cpu().numpy()
             y_hat = y_hat.detach().cpu().numpy()
-            r2 = r2_score(y, y_hat)
-            return r2
+            r2_oc = r2_score(y, y_hat)
+
+            intermediate_hat = intermediate_hat.reshape(-1)
+            intermediate = intermediate.detach().cpu().numpy()
+            intermediate_hat = intermediate_hat.detach().cpu().numpy()
+            r2_n = r2_score(intermediate, intermediate_hat)
+
+            return r2_n, r2_oc
