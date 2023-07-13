@@ -17,7 +17,6 @@ if __name__ == "__main__":
             repeat=1,
             folds=10,
             prefix=f"single_{alpha}",
-            files="data/vis_with_empty.csv",
             alpha=alpha
         )
         ev.process()

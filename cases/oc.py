@@ -10,8 +10,7 @@ if __name__ == "__main__":
         cofigs=[{"x": rgb, "y": "oc"}],
         repeat=1,
         folds=10,
-        prefix=f"oc",
-        files="data/vis_with_empty.csv"
+        prefix=f"oc"
     )
     ev.process()
     print("Done all")

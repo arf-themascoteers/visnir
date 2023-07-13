@@ -13,8 +13,7 @@ if __name__ == "__main__":
         cofigs=configs,
         repeat=1,
         folds=10,
-        prefix=f"prop_oc",
-        files="data/vis_with_empty.csv"
+        prefix=f"prop_oc"
     )
     ev.process()
 
