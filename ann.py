@@ -10,7 +10,7 @@ class ANN(nn.Module):
     def __init__(self, device, train_ds, test_ds, alpha = 0.0):
         super().__init__()
         torch.manual_seed(1)
-        self.TEST = True
+        self.TEST = False
         self.device = device
         self.train_ds = train_ds
         self.test_ds = test_ds
