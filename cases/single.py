@@ -9,7 +9,7 @@ def process():
     for property in ["phc","phh","ec","caco3","p","n","k","stones"]:
         configs.append({"x":rgb, "y":"oc",  "intermediate":[property]})
 
-    for alpha in range(10):
+    for alpha in range(11):
         ev = Evaluator(
             cofigs=configs,
             repeat=1,
