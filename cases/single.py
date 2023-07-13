@@ -9,17 +9,15 @@ def process():
     for property in ["phc","phh","ec","caco3","p","n","k","stones"]:
         configs.append({"x":rgb, "y":"oc",  "intermediate":[property]})
 
-    alpha = 0
-    while alpha <= 0.9:
+    for alpha in range(10):
         ev = Evaluator(
             cofigs=configs,
             repeat=1,
             folds=10,
             prefix=f"single_{alpha}",
-            alpha=alpha
+            alpha=alpha/10
         )
         ev.process()
-        alpha = alpha + 0.1
 
     print("Done all")
 

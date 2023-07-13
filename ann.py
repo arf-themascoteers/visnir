@@ -108,9 +108,11 @@ class ANN(nn.Module):
             y_hat = y_hat.detach().cpu().numpy()
             r2_oc = r2_score(y, y_hat)
 
-            intermediate_hat = intermediate_hat.reshape(-1)
-            intermediate = intermediate.detach().cpu().numpy()
-            intermediate_hat = intermediate_hat.detach().cpu().numpy()
-            r2_n = r2_score(intermediate, intermediate_hat)
+            r2_n = 0
+            if intermediate_hat is not None:
+                intermediate_hat = intermediate_hat.reshape(-1)
+                intermediate = intermediate.detach().cpu().numpy()
+                intermediate_hat = intermediate_hat.detach().cpu().numpy()
+                r2_n = r2_score(intermediate, intermediate_hat)
 
             return r2_n, r2_oc

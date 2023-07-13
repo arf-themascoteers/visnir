@@ -4,7 +4,9 @@ import oc_prop
 import prop_oc
 import rgb_prop
 import single
+import os
 
+os.chdir("../")
 
 auxy.process()
 oc.process()
