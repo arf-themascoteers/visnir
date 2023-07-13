@@ -35,9 +35,6 @@ class Evaluator:
         self.sync_details_file()
         self.create_log_file()
 
-        self.TEST = False
-        self.TEST_SCORE = 0
-
     def get_details_columns(self):
         details_columns = []
         for config in self.configs:
@@ -153,10 +150,6 @@ class Evaluator:
             self.write_details()
 
     def calculate_score(self, train_ds, test_ds):
-        if self.TEST:
-            self.TEST_SCORE = self.TEST_SCORE + 1
-            return self.TEST_SCORE
-
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model = ANN(device, train_ds, test_ds, self.alpha)
         model.train_model()

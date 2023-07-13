@@ -10,6 +10,7 @@ class ANN(nn.Module):
     def __init__(self, device, train_ds, test_ds, alpha = 0.0):
         super().__init__()
         torch.manual_seed(1)
+        self.TEST = True
         self.device = device
         self.train_ds = train_ds
         self.test_ds = test_ds
@@ -62,6 +63,8 @@ class ANN(nn.Module):
         return x, x2
 
     def train_model(self):
+        if self.TEST:
+            return
         self.train()
         self.to(self.device)
         optimizer = torch.optim.Adam(self.parameters(), lr=self.lr, weight_decay=0.001)
