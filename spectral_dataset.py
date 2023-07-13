@@ -6,8 +6,6 @@ class SpectralDataset(Dataset):
     def __init__(self, source, x=None, intermediate=None):
         self.NAN = -9999
         self.df = source
-        if x is None:
-            x = list(range(source.shape[1]-1))
         self.x = torch.tensor(source[:,x], dtype=torch.float32)
 
         if torch.isnan(self.x).sum() != 0:
@@ -15,8 +13,6 @@ class SpectralDataset(Dataset):
         if self.x[self.x == self.NAN].shape[0] != 0:
             raise "NAN in X"
 
-        if intermediate is None:
-            intermediate = []
         self.intermediate = torch.tensor(source[:,intermediate], dtype=torch.float32)
         self.y = torch.tensor(source[:,-1], dtype=torch.float32)
 

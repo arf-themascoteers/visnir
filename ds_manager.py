@@ -12,9 +12,11 @@ class DSManager:
         if x is None:
             x = ["665", "560", "490"]
         self.x = x
+        self.x_cols = list(range(len(self.x)))
         if intermediate is None:
             intermediate = []
         self.intermediate = intermediate
+        self.intermediate_cols = list(range(len(self.x), len(self.x) + len(self.intermediate)))
         self.y = y
         self.name = name
         self.folds = folds
@@ -39,7 +41,8 @@ class DSManager:
         for i, (train_index, test_index) in enumerate(kf.split(self.full_data)):
             train_data = self.full_data[train_index]
             test_data = self.full_data[test_index]
-            yield SpectralDataset(train_data), SpectralDataset(test_data)
+            yield SpectralDataset(train_data, self.x_cols, self.intermediate_cols), \
+                SpectralDataset(test_data, self.x_cols, self.intermediate_cols)
 
     def get_folds(self):
         return self.folds
