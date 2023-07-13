@@ -69,8 +69,8 @@ class ANN(nn.Module):
                 oc_hat = oc_hat.reshape(-1)
                 loss_n = criterion(n_hat, n)
                 loss_oc = criterion(oc_hat, oc)
-                phy = F.relu()
-                loss = loss_n + loss_oc + (self.alpha * )
+                loss_phy = torch.sum(F.relu(n_hat-oc_hat)) # add all combination # add reduced combinations
+                loss = loss_n + loss_oc + (self.alpha * loss_phy)
                 loss.backward()
                 optimizer.step()
                 optimizer.zero_grad()
@@ -84,21 +84,20 @@ class ANN(nn.Module):
 
         dataloader = DataLoader(self.test_ds, batch_size=batch_size, shuffle=True)
 
-        for (x, intermediate, y) in dataloader:
+        for (x, n, oc) in dataloader:
             x = x.to(self.device)
-            y = y.to(self.device)
-            y_hat, intermediate_hat = self(x)
+            n = n.to(self.device)
+            oc = oc.to(self.device)
+            n_hat, oc_hat = self(x)
+            n_hat = n_hat.reshape(-1)
+            oc_hat = oc_hat.reshape(-1)
 
-            y_hat = y_hat.reshape(-1)
-            y = y.detach().cpu().numpy()
-            y_hat = y_hat.detach().cpu().numpy()
-            r2_oc = r2_score(y, y_hat)
+            n = n.detach().cpu().numpy()
+            n_hat = n_hat.detach().cpu().numpy()
+            r2_n = r2_score(n, n_hat)
 
-            r2_n = 0
-            if intermediate_hat is not None:
-                intermediate_hat = intermediate_hat.reshape(-1)
-                intermediate = intermediate.detach().cpu().numpy()
-                intermediate_hat = intermediate_hat.detach().cpu().numpy()
-                r2_n = r2_score(intermediate, intermediate_hat)
+            oc = oc.detach().cpu().numpy()
+            oc_hat = oc_hat.detach().cpu().numpy()
+            r2_oc = r2_score(oc, oc_hat)
 
             return r2_n, r2_oc
