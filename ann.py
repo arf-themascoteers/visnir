@@ -23,44 +23,29 @@ class ANN(nn.Module):
         self.intermediate_size = train_ds.get_intermediate().shape[1]
         size = x_size
 
-        if self.intermediate_size == 0:
-            self.linear = nn.Sequential(
-                nn.Linear(size, 12),
-                nn.LeakyReLU(),
-                nn.Linear(12, 5),
-                nn.LeakyReLU(),
-                nn.Linear(5, 4),
-                nn.LeakyReLU(),
-                nn.Linear(4, 1)
-            )
-        else:
-            self.soc_vec = nn.Sequential(
-                nn.Linear(size, 10),
-                nn.LeakyReLU(),
-                nn.Linear(10, 4)
-            )
+        self.common = nn.Sequential(
+            nn.Linear(size, 12),
+            nn.LeakyReLU(),
+            nn.Linear(12, 5)
+        )
 
-            self.inter_vec = nn.Sequential(
-                nn.Linear(size,2),
-                nn.LeakyReLU(),
-                nn.Linear(2,self.intermediate_size)
-            )
-            self.soc = nn.Sequential(
-                nn.Linear(4 + self.intermediate_size,4),
-                nn.LeakyReLU(),
-                nn.Linear(4,1)
-            )
+        self.n = nn.Sequential(
+            nn.Linear(5,3),
+            nn.LeakyReLU(),
+            nn.Linear(3, 1)
+        )
+
+        self.oc = nn.Sequential(
+            nn.Linear(5,3),
+            nn.LeakyReLU(),
+            nn.Linear(3, 1)
+        )
 
     def forward(self, x):
-        if self.intermediate_size == 0:
-            x = self.linear(x)
-            return x, None
-        x1 = self.soc_vec(x)
-        x2 = self.inter_vec(x)
-        x = torch.hstack((x1,x2))
-        x = F.leaky_relu(x)
-        x = self.soc(x)
-        return x, x2
+        common = self.common(x)
+        n = self.n(common)
+        oc = self.oc(common)
+        return n, oc
 
     def train_model(self):
         if self.TEST:
@@ -75,16 +60,17 @@ class ANN(nn.Module):
 
         for epoch in range(self.num_epochs):
             batch_number = 0
-            for (x, intermediate, y) in dataloader:
+            for (x, n, oc) in dataloader:
                 x = x.to(self.device)
-                y = y.to(self.device)
-                y_hat, intermediate_hat = self(x)
-                y_hat = y_hat.reshape(-1)
-                loss = criterion(y_hat, y)
-                if intermediate.shape[1] !=0:
-                    intermediate = intermediate.to(self.device)
-                    loss_intermediate = criterion(intermediate_hat, intermediate)
-                    loss = (1-self.alpha) * loss + self.alpha * loss_intermediate
+                n = n.to(self.device)
+                oc = oc.to(self.device)
+                n_hat, oc_hat = self(x)
+                n_hat = n_hat.reshape(-1)
+                oc_hat = oc_hat.reshape(-1)
+                loss_n = criterion(n_hat, n)
+                loss_oc = criterion(oc_hat, oc)
+                phy = F.relu()
+                loss = loss_n + loss_oc + (self.alpha * )
                 loss.backward()
                 optimizer.step()
                 optimizer.zero_grad()

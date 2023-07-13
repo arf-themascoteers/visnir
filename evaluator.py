@@ -7,12 +7,9 @@ import torch
 from ann import ANN
 
 class Evaluator:
-    def __init__(self, cofigs=None, prefix="", verbose=False,
+    def __init__(self, prefix="", verbose=False,
                  repeat=1, folds=5, alpha=0
                  ):
-        if cofigs is None:
-            cofigs = [{"x":["665", "560", "490"], "intermediate":[], "y":"oc"}]
-        self.configs = cofigs
         self.repeat = repeat
         self.alpha = alpha
         self.folds = folds
@@ -26,8 +23,8 @@ class Evaluator:
 
         self.summary_index = self.create_summary_index()
 
-        self.details_n = np.zeros((self.folds*self.repeat, len(self.configs)))
-        self.details_oc = np.zeros((self.folds*self.repeat, len(self.configs)))
+        self.details_n = np.zeros((self.folds*self.repeat, 1))
+        self.details_oc = np.zeros((self.folds*self.repeat, 1))
         self.details_index = self.get_details_index()
         self.details_columns = self.get_details_columns()
         self.summary_columns = self.get_summary_columns()
@@ -37,8 +34,7 @@ class Evaluator:
 
     def get_details_columns(self):
         details_columns = []
-        for config in self.configs:
-            details_columns.append(f"{self.get_config_name(config)}")
+        details_columns.append(f"RUN")
         return details_columns
 
     def get_summary_columns(self):
@@ -99,7 +95,7 @@ class Evaluator:
 
     def log_scores(self, repeat_number, fold_number, config, score_n, score_oc):
         log_file = open(self.log_file, "a")
-        log_file.write(f"\n{repeat_number} - {fold_number} - {self.get_config_name(config)}\n")
+        log_file.write(f"\n{repeat_number} - {fold_number} - RUN\n")
         log_file.write(str(score_n))
         log_file.write(str(score_oc))
         log_file.write("\n")
@@ -126,16 +122,12 @@ class Evaluator:
         self.write_summary(score_mean_n, score_mean_oc)
 
     def process_repeat(self, repeat_number):
-        for index_config, config in enumerate(self.configs):
-            self.process_config(repeat_number, index_config)
+        self.process_config(repeat_number, 1)
 
     def process_config(self, repeat_number, index_config):
-        config = self.configs[index_config]
-        print("Start", f"{repeat_number}:{self.get_config_name(config)}")
-        intermediate = []
-        if "intermediate" in config:
-            intermediate = config["intermediate"]
-        ds = ds_manager.DSManager(folds=self.folds, x=config["x"], y=config["y"], intermediate=intermediate)
+        config = "RUN"
+        print("Start", f"{repeat_number}:RUN")
+        ds = ds_manager.DSManager(folds=self.folds)
 
         for fold_number, (train_ds, test_ds) in enumerate(ds.get_k_folds()):
             score_n, score_oc = self.get_details(index_config, repeat_number, fold_number)
@@ -157,7 +149,6 @@ class Evaluator:
 
     def create_summary_index(self):
         index = []
-        for config in self.configs:
-            name = self.get_config_name(config)
-            index.append(f"{name}")
+        name = "RUN"
+        index.append(f"{name}")
         return index

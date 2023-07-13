@@ -3,18 +3,11 @@ from evaluator import Evaluator
 
 
 def process():
-    rgb = ["665", "560", "490"]
-    configs = []
-
-    for property in ["phc","phh","ec","caco3","p","n","k","stones"]:
-        configs.append({"x":rgb, "y":"oc",  "intermediate":[property]})
-
     for alpha in range(11):
         ev = Evaluator(
-            cofigs=configs,
             repeat=1,
             folds=10,
-            prefix=f"single_{alpha}",
+            prefix=f"para_{alpha}",
             alpha=alpha/10
         )
         ev.process()

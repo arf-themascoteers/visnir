@@ -7,22 +7,15 @@ from sklearn.model_selection import KFold
 
 
 class DSManager:
-    def __init__(self, name=None, folds=10, x=None, y="oc",intermediate=None):
+    def __init__(self, name=None, folds=10):
         self.files = "data/vis_with_empty.csv"
-        if x is None:
-            x = ["665", "560", "490"]
-        self.x = x
-        self.x_cols = list(range(len(self.x)))
-        if intermediate is None:
-            intermediate = []
-        self.intermediate = intermediate
-        self.intermediate_cols = list(range(len(self.x), len(self.x) + len(self.intermediate)))
-        self.y = y
+        self.x = ["665", "560", "490"]
+        self.y = ["n","oc"]
         self.name = name
         self.folds = folds
         train_df, test_df = self.get_random_train_test_df()
         df = pd.concat([train_df, test_df])
-        columns = x + intermediate + [y]
+        columns = self.x + self.y
         df = df[columns]
         self.full_data = df.to_numpy()
         self.full_data = self._normalize(self.full_data)
@@ -36,13 +29,14 @@ class DSManager:
     def read_from_csv(self, file):
         df = pd.read_csv(file)
         return df
+
     def get_k_folds(self):
         kf = KFold(n_splits=self.folds)
         for i, (train_index, test_index) in enumerate(kf.split(self.full_data)):
             train_data = self.full_data[train_index]
             test_data = self.full_data[test_index]
-            yield SpectralDataset(train_data, self.x_cols, self.intermediate_cols), \
-                SpectralDataset(test_data, self.x_cols, self.intermediate_cols)
+            yield SpectralDataset(train_data), \
+                SpectralDataset(test_data)
 
     def get_folds(self):
         return self.folds
