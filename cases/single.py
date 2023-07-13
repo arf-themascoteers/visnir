@@ -3,7 +3,7 @@ os.chdir("../")
 from evaluator import Evaluator
 
 
-if __name__ == "__main__":
+def process():
     rgb = ["665", "560", "490"]
     configs = []
 
@@ -23,3 +23,7 @@ if __name__ == "__main__":
         alpha = alpha + 0.1
 
     print("Done all")
+
+
+if __name__ == "__main__":
+    process()

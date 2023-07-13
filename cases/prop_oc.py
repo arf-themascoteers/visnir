@@ -3,7 +3,7 @@ os.chdir("../")
 from evaluator import Evaluator
 
 
-if __name__ == "__main__":
+def process():
     configs = []
 
     for property in ["phc","phh","ec","caco3","p","n","k","stones"]:
@@ -18,3 +18,7 @@ if __name__ == "__main__":
     ev.process()
 
     print("Done all")
+
+
+if __name__ == "__main__":
+    process()
