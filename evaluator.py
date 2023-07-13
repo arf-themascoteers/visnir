@@ -8,7 +8,7 @@ from ann import ANN
 
 class Evaluator:
     def __init__(self, cofigs=None, prefix="", verbose=False,
-                 repeat=1, folds=10, files = None, ratios = None,
+                 repeat=1, folds=5, files = None, ratios = None,
                  alpha=0
                  ):
         if cofigs is None:

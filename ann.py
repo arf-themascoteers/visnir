@@ -14,7 +14,7 @@ class ANN(nn.Module):
         self.train_ds = train_ds
         self.test_ds = test_ds
         self.alpha = alpha
-        self.num_epochs = 600
+        self.num_epochs = 300
         self.batch_size = 600
         self.lr = 0.01
 
