@@ -71,7 +71,7 @@ class ANN(nn.Module):
                 optimizer.step()
                 optimizer.zero_grad()
                 batch_number += 1
-                #print(f'Epoch:{epoch + 1} (of {num_epochs}), Batch: {batch_number} of {n_batches}, Loss:{loss.item():.6f}')
+                #print(f'Epoch:{epoch + 1} (of {self.num_epochs}), Batch: {batch_number} of {n_batches}, Loss:{loss.item():.6f}')
 
     def test(self):
         batch_size = 30000
