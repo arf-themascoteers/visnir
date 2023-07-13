@@ -24,13 +24,13 @@ class ANN(nn.Module):
 
         if self.intermediate_size == 0:
             self.linear = nn.Sequential(
-                nn.Linear(size, 10),
+                nn.Linear(size, 12),
                 nn.LeakyReLU(),
-                nn.Linear(10, 5),
+                nn.Linear(12, 5),
                 nn.LeakyReLU(),
-                nn.Linear(5, 3),
+                nn.Linear(5, 4),
                 nn.LeakyReLU(),
-                nn.Linear(3, 1)
+                nn.Linear(4, 1)
             )
         else:
             self.soc_vec = nn.Sequential(
