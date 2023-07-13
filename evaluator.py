@@ -122,7 +122,7 @@ class Evaluator:
         self.write_summary(score_mean_n, score_mean_oc)
 
     def process_repeat(self, repeat_number):
-        self.process_config(repeat_number, 1)
+        self.process_config(repeat_number, 0)
 
     def process_config(self, repeat_number, index_config):
         config = "RUN"

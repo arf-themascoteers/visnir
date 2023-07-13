@@ -19,12 +19,8 @@ class ANN(nn.Module):
         self.batch_size = 600
         self.lr = 0.01
 
-        x_size = train_ds.get_x().shape[1]
-        self.intermediate_size = train_ds.get_intermediate().shape[1]
-        size = x_size
-
         self.common = nn.Sequential(
-            nn.Linear(size, 12),
+            nn.Linear(3, 12),
             nn.LeakyReLU(),
             nn.Linear(12, 5)
         )
