@@ -139,7 +139,7 @@ class Evaluator:
 
         for fold_number, (train_ds, test_ds) in enumerate(ds.get_k_folds()):
             score_n, score_oc = self.get_details(index_config, repeat_number, fold_number)
-            if score_n != 0:
+            if score_oc != 0:
                 print(f"{repeat_number}-{fold_number} done already")
             else:
                 score_n, score_oc = self.calculate_score(train_ds, test_ds)
