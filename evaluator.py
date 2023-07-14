@@ -8,7 +8,7 @@ from ann import ANN
 
 class Evaluator:
     def __init__(self, cofigs=None, prefix="", verbose=False,
-                 repeat=1, folds=5, alpha=0
+                 repeat=1, folds=10, alpha=0
                  ):
         if cofigs is None:
             cofigs = [{"x":["665", "560", "490"], "intermediate":[], "y":"oc"}]
