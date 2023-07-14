@@ -35,18 +35,18 @@ class ANN(nn.Module):
             )
         else:
             self.soc_vec = nn.Sequential(
-                nn.Linear(size, 10),
+                nn.Linear(size, 12),
                 nn.LeakyReLU(),
-                nn.Linear(10, 4)
+                nn.Linear(12, 5)
             )
 
             self.inter_vec = nn.Sequential(
-                nn.Linear(size,2),
+                nn.Linear(size,10),
                 nn.LeakyReLU(),
-                nn.Linear(2,self.intermediate_size)
+                nn.Linear(10,self.intermediate_size)
             )
             self.soc = nn.Sequential(
-                nn.Linear(4 + self.intermediate_size,4),
+                nn.Linear(5 + self.intermediate_size,4),
                 nn.LeakyReLU(),
                 nn.Linear(4,1)
             )
