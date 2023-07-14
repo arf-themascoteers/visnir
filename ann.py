@@ -15,26 +15,26 @@ class ANN(nn.Module):
         self.train_ds = train_ds
         self.test_ds = test_ds
         self.alpha = alpha
-        self.num_epochs = 300
+        self.num_epochs = 600
         self.batch_size = 600
         self.lr = 0.01
 
         self.common = nn.Sequential(
             nn.Linear(3, 12),
             nn.LeakyReLU(),
-            nn.Linear(12, 5)
+            nn.Linear(12, 10)
         )
 
         self.n = nn.Sequential(
-            nn.Linear(5,3),
+            nn.Linear(10,6),
             nn.LeakyReLU(),
-            nn.Linear(3, 1)
+            nn.Linear(6, 1)
         )
 
         self.oc = nn.Sequential(
-            nn.Linear(5,3),
+            nn.Linear(10,6),
             nn.LeakyReLU(),
-            nn.Linear(3, 1)
+            nn.Linear(6, 1)
         )
 
     def forward(self, x):
