@@ -3,12 +3,12 @@ from evaluator import Evaluator
 
 
 def process():
-    for alpha in range(11):
+    for alpha in range(1,11):
         ev = Evaluator(
             repeat=1,
             folds=10,
             prefix=f"para_{alpha}",
-            alpha=alpha/10
+            alpha=alpha/50
         )
         ev.process()
 
